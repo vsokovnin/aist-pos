@@ -1,0 +1,10 @@
+# AIST POS — рабочая папка пользователя
+.env
+*.key
+aist-pos.config.yaml
+runtime/
+# медиа
+*.png
+*.jpg
+*.pdf
+*.zip

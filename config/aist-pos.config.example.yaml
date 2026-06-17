@@ -1,0 +1,17 @@
+# AIST POS — пользовательский конфиг (копируется в aist-pos.config.yaml на /setup).
+# Портативный: ноль приватной инфры. Скилы читают ТОЛЬКО этот файл + connectors.md.
+identity:
+  name: "<ваше имя>"
+  role: "<роль, напр. член совета директоров>"
+  timezone: "Europe/Moscow"
+horizon_days: 7            # окно разбора входящих / брифа
+connectors:                # значения резолвятся через connectors.md
+  email: none              # gmail | outlook | none
+  calendar: none           # gmail | outlook | none
+  messenger: none          # telegram | none
+  transcripts: none        # granola | plaud | local | none
+output_surface: file       # telegram | file
+stores:                    # относительные пути (от рабочей папки пользователя)
+  entities: entities/      # граф: организация (база) <- люди, проекты
+  tasks: runtime/tasks.md  # вывод задач и долгов (US1)
+  brief: runtime/brief.md  # вывод брифа (US2)
