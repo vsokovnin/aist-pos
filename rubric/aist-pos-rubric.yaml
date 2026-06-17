@@ -4,7 +4,7 @@
 # headline-стадия (гибрид) = round(mean(cluster_avg)); слабое звено (min cluster_avg) показывается отдельно — см. stage-map.yaml.
 meta:
   version: 0.1
-  source_ssot: "Founder/POS/{pos} {analysis} критерии зрелости cmm – 2026-05-25.md"
+  source_ssot: "docs/capability-model.md"
   scoring: "per-cap levels; weakest-link flagged; headline stage = round(mean(cluster_avg)); weak_link = argmin(cluster_avg)"
 
 clusters:
