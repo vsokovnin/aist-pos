@@ -34,6 +34,7 @@ capabilities:
       L5: "Память сама гигиенична: устаревшее архивируется, повторы промотируются в правило"
     actions:
       to_L3: "Поставь файлы памяти; раздели семантическую и процедурную"
+      native: "Нативно быстрее: плагин Productivity (двухуровневая память + захват из разговоров)."
 
   - id: context_seed      # CMM #17
     cluster: context
@@ -130,6 +131,7 @@ capabilities:
       L5: "Слой сам расширяется: часто используемая через браузер система триггерит подключение; мёртвые коннекторы отключаются"
     actions:
       to_L3: "Подключи Gmail/Outlook + Calendar коннекторы"
+      native: "Нативные Connectors Claude: Google Workspace (дефолт для индивида) или M365 (enterprise, read-only)."
 
   - id: capture           # CMM #11
     cluster: capture
@@ -146,6 +148,7 @@ capabilities:
       L5: "Захват сам совершенствуется: новый рекуррентный источник подключается автоматически; шум фильтруется по данным"
     actions:
       to_L3: "Настрой ингест источников → inbox"
+      native: "Нативно быстрее: Productivity (/update --comprehensive) или Enterprise search для разбора входящих."
 
   - id: graph             # CMM #13
     cluster: capture
