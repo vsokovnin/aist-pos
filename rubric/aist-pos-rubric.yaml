@@ -15,7 +15,7 @@ clusters:
     title: "Файлы, структура, доступ"
     caps: [naming, root_file, git, source_map, connectors]
   - id: capture
-    title: "Захват и граф знаний"
+    title: "Входящие и знания о ваших делах"
     caps: [capture, graph]
 
 capabilities:
