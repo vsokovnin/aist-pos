@@ -12,6 +12,6 @@ connectors:                # значения резолвятся через co
   transcripts: none        # granola | plaud | local | none
 output_surface: file       # telegram | file
 stores:                    # относительные пути (от рабочей папки пользователя)
-  entities: entities/      # граф: организация (база) <- люди, проекты
-  tasks: runtime/tasks.md  # вывод задач и долгов (US1)
+  entities: entities/      # база контактов (граф): организация <- люди, проекты
+  tasks: runtime/tasks.md  # вывод задач и обязательств (US1)
   brief: runtime/brief.md  # вывод брифа (US2)
