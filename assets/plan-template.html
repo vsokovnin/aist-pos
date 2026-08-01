@@ -300,15 +300,6 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
   <div class="mainstep" id="mainStep"></div>
 </section>
 
-<section id="sets">
-  <div class="sechead"><h2>Что вы хотите закрыть первым</h2></div>
-  <p class="lead">Набор — не список файлов, которые надо завести, а задача, которая после него делается сама. Шаг, сделанный в одном наборе, засчитывается в остальных.</p>
-  <h3 class="subhead" id="recHead">Рекомендуем вам</h3>
-  <div class="grid" id="gridRec"></div>
-  <h3 class="subhead">Вся библиотека</h3>
-  <div class="grid" id="gridAll"></div>
-</section>
-
 <section id="diagnoz">
   <div class="sechead"><h2>Профиль: где сильно, где проседает</h2></div>
   <div class="diag">
@@ -321,6 +312,18 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
       <div id="dirList"></div>
     </div>
   </div>
+</section>
+
+<section id="sets">
+  <div class="sechead"><h2>Что вы хотите закрыть первым</h2></div>
+  <p class="lead">Набор — не список файлов, которые надо завести, а задача, которая после него делается сама. Шаг, сделанный в одном наборе, засчитывается в остальных.</p>
+  <h3 class="subhead" id="recHead">Рекомендуем вам</h3>
+  <div class="grid" id="gridRec"></div>
+</section>
+
+<section id="library">
+  <div class="sechead"><h2>Библиотека наборов</h2></div>
+  <div class="grid" id="gridAll"></div>
 </section>
 
 <section id="uvidel">
@@ -983,7 +986,7 @@ $("#mainStep").innerHTML = '<div class="k">' + esc(DATA.mainStep.kicker) + "</di
   const ang = i => (-Math.PI/2) + (2*Math.PI*i/n);
   const pt = (i, r) => [cx + r*Math.cos(ang(i)), cy + r*Math.sin(ang(i))];
   const poly = vals => vals.map((v,i) => pt(i, R*v/5).map(x => x.toFixed(1)).join(",")).join(" ");
-  let s = '<svg class="radar" viewBox="0 0 460 470" role="img" aria-label="Профиль по девяти способностям, май и июль">';
+  let s = '<svg class="radar" viewBox="0 0 460 470" role="img" aria-label="Профиль по способностям">';
   for (let ring = 1; ring <= 5; ring++)
     s += '<polygon points="' + caps.map((_,i) => pt(i, R*ring/5).map(x => x.toFixed(1)).join(",")).join(" ") +
          '" fill="none" stroke="#E0E0E0" stroke-width="1"/>';
@@ -992,14 +995,16 @@ $("#mainStep").innerHTML = '<div class="k">' + esc(DATA.mainStep.kicker) + "</di
     s += '<line x1="' + cx + '" y1="' + cy + '" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) +
          '" stroke="#E0E0E0" stroke-width="1"/>';
   });
-  s += '<polygon points="' + poly(caps.map(c => c.levelNow)) +
-       '" fill="rgba(22,163,74,.10)" stroke="#16A34A" stroke-width="2"/>';
+  if (isRepeat)
+    s += '<polygon points="' + poly(caps.map(c => c.levelNow)) +
+         '" fill="rgba(22,163,74,.10)" stroke="#16A34A" stroke-width="2"/>';
   s += '<polygon points="' + poly(caps.map(c => c.level)) +
        '" fill="rgba(0,72,178,.10)" stroke="#0048B2" stroke-width="2"/>';
   caps.forEach((c,i) => {
     const [x,y] = pt(i, R*c.level/5);
     s += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3.5" fill="#0048B2"><title>' +
-         esc(c.title) + ": " + c.level + " → " + c.levelNow + "</title></circle>";
+         esc(c.title) + ": " + (c.levelNow !== c.level ? c.level + " → " + c.levelNow : c.level) +
+         "</title></circle>";
   });
   caps.forEach((c,i) => {
     const [x,y] = pt(i, LR);
@@ -1011,22 +1016,26 @@ $("#mainStep").innerHTML = '<div class="k">' + esc(DATA.mainStep.kicker) + "</di
          (c.levelNow !== c.level ? "→" + c.levelNow : "") + "</tspan></text>";
   });
   $("#radarBox").innerHTML = s + "</svg>";
-  $("#radarLegend").innerHTML =
-    '<span><i style="background:#0048B2"></i>' + esc(DATA.meta.labelWas) + "</span>" +
-    '<span><i style="background:#16A34A"></i>' + esc(DATA.meta.labelNow) + "</span>";
+  $("#radarLegend").innerHTML = isRepeat
+    ? '<span><i style="background:#0048B2"></i>' + esc(DATA.meta.labelWas) + "</span>" +
+      '<span><i style="background:#16A34A"></i>' + esc(DATA.meta.labelNow) + "</span>"
+    : "";
 })();
 
 /* weak direction + profile */
 $("#weakBox").innerHTML = '<div class="k">Что подтянуть первым</div><p>' + esc(DATA.weakNote) + "</p>";
 $("#dirList").innerHTML = DATA.directions.map(d => {
   const caps = DATA.capabilities.filter(c => c.dir === d.id);
-  const min = Math.min(...caps.map(c => c.level));
-  return '<div class="dir"><h3>' + esc(d.title) + "<em>" + avg(d.id,"level").toFixed(1) +
-    " → " + avg(d.id,"levelNow").toFixed(1) + "</em></h3>" +
+  const minNow = Math.min(...caps.map(c => c.levelNow));
+  const minWas = Math.min(...caps.map(c => c.level));
+  return '<div class="dir"><h3>' + esc(d.title) + "<em>" +
+    (isRepeat ? avg(d.id,"level").toFixed(1) + " → " : "") +
+    avg(d.id,"levelNow").toFixed(1) + "</em></h3>" +
     caps.map(c => {
       const w = c.level/5*100, wn = c.levelNow/5*100;
       return '<div class="caprow"><span class="nm">' + esc(c.title) +
-        (c.level === min ? '<span class="weak">было слабое звено</span>' : "") +
+        (c.levelNow === minNow ? '<span class="weak">слабое звено</span>'
+          : isRepeat && c.level === minWas ? '<span class="weak">было слабое звено</span>' : "") +
         '</span><span class="bar"><u style="left:' + w + '%;right:' + (100-wn) + '%"></u>' +
         '<i style="width:' + w + '%"></i></span><span class="lv">' + c.level +
         (c.levelNow !== c.level ? "<b>→" + c.levelNow + "</b>" : "&nbsp;&nbsp;&nbsp;") + "</span></div>";
@@ -1060,7 +1069,8 @@ function renderCaps(view){
   $("#capList").innerHTML = view === "flat"
     ? DATA.capabilities.map(capBlock).join("")
     : DATA.directions.map(d => '<div class="grp"><h3>' + esc(d.title) + "<em>" +
-        avg(d.id,"level").toFixed(1) + " → " + avg(d.id,"levelNow").toFixed(1) + "</em></h3>" +
+        (isRepeat ? avg(d.id,"level").toFixed(1) + " → " : "") +
+        avg(d.id,"levelNow").toFixed(1) + "</em></h3>" +
         DATA.capabilities.filter(c => c.dir === d.id).map(capBlock).join("") + "</div>").join("");
 }
 renderCaps("grouped");
@@ -1088,7 +1098,7 @@ function setCard(s){
 
 const pinnedSets = SETS.filter(isPinned);
 $("#gridRec").innerHTML = pinnedSets.map(setCard).join("");
-if (!pinnedSets.length) { $("#gridRec").hidden = true; $("#recHead").hidden = true; }
+if (!pinnedSets.length) $("#sets").hidden = true;
 $("#gridAll").innerHTML = SETS.map(setCard).join("");
 
 const dlg = $("#dlg");
@@ -1143,8 +1153,8 @@ document.addEventListener("change", e => {
 });
 
 /* nav + numbering */
-const NAV = [["svodka","Сейчас"],["sets","Наборы"],["diagnoz","Профиль"],["uvidel","Что видно"],
-  ["rost","Куда расти"],["signaly","Сигналы"],["reassess","Следующая оценка"],["journal","Журнал"]];
+const NAV = [["svodka","Сейчас"],["diagnoz","Профиль"],["sets","Наборы"],["library","Библиотека"],
+  ["uvidel","Что видно"],["rost","Куда расти"],["signaly","Сигналы"],["reassess","Следующая оценка"],["journal","Журнал"]];
 $("#navLinks").innerHTML = NAV.filter(([id]) => {
   const el = document.getElementById(id); return el && !el.hidden;
 }).map(([id,l]) => '<a href="#' + id + '">' + l + "</a>").join("");
