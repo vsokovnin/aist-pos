@@ -4,7 +4,7 @@
 set -euo pipefail
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-name="aist-pos"
+name="${1:-aist-pos}"   # можно собрать под другим именем: ./scripts/pack.sh aist-pos-fresh
 version="$(awk -F': *' '/^version:/{print $2; exit}' "$repo/SKILL.md")"
 dist="$repo/dist"
 stage="$(mktemp -d)"
@@ -54,6 +54,10 @@ ITEMS
 
 # pack.sh — инструмент сборки, человеку он не нужен
 rm -f "$stage/$name/scripts/pack.sh"
+# имя навыка внутри пакета должно совпадать с именем папки
+if [ "$name" != "aist-pos" ]; then
+  sed -i '' "s/^name: aist-pos$/name: $name/" "$stage/$name/SKILL.md"
+fi
 find "$stage" -name '.DS_Store' -delete
 find "$stage" -name 'aist-pos.config.yaml' -delete
 
