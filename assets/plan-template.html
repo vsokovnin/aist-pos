@@ -931,6 +931,11 @@ const avg = (id, key) => {
   const caps = DATA.capabilities.filter(c => c.dir === id);
   return caps.reduce((s,c) => s + c[key], 0) / caps.length;
 };
+const capLevel = id => (capById(id) || { levelNow: 0 }).levelNow;
+const setCapsOpen = s => s.caps.filter(c => capLevel(c) < 3);
+const setStepsOpen = s => setCapsOpen(s)
+  .map(c => DATA.nextSteps.find(x => x.cap === c))
+  .filter(Boolean);
 
 /* header */
 $("#hTitle").textContent = "Зрелость вашей личной ОС";
@@ -1066,12 +1071,6 @@ $(".vswitch").addEventListener("click", e => {
 });
 
 /* наборы */
-const capLevel = id => (capById(id) || { levelNow: 0 }).levelNow;
-const setCapsOpen = s => s.caps.filter(c => capLevel(c) < 3);
-const setStepsOpen = s => setCapsOpen(s)
-  .map(c => DATA.nextSteps.find(x => x.cap === c))
-  .filter(Boolean);
-
 const isPinned = s => (DATA.pinned || []).includes(s.id);
 
 function setCard(s){
