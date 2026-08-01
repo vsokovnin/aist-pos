@@ -19,9 +19,17 @@ real_caps="$(grep -c '^    cluster: ' "$rubric")"
 real_cl="$(grep -c '^    caps: \[' "$rubric")"
 [ "$declared_caps" = "$real_caps" ] || { echo "СБОРКА ОСТАНОВЛЕНА: в рубрике $real_caps способностей, meta обещает $declared_caps"; exit 1; }
 [ "$declared_cl" = "$real_cl" ] || { echo "СБОРКА ОСТАНОВЛЕНА: в рубрике $real_cl направлений, meta обещает $declared_cl"; exit 1; }
-for f in "$repo/README.md" "$repo/docs/capability-model.md" "$repo/workflows/assess.md"; do
-  bad="$(grep -oE '[0-9]+ (способност|базовых способност)' "$f" | grep -v "^$real_caps " || true)"
-  [ -z "$bad" ] || { echo "СБОРКА ОСТАНОВЛЕНА: $f называет другое число способностей: $bad"; exit 1; }
+words="один два три четыре пять шесть семь восемь девять десять одиннадцать двенадцать тринадцать четырнадцать пятнадцать шестнадцать семнадцать восемнадцать девятнадцать двадцать"
+right_word="$(echo "$words" | awk -v n="$real_caps" '{print $n}')"
+right_cl_word="$(echo "$words" | awk -v n="$real_cl" '{print $n}')"
+for f in "$repo/SKILL.md" "$repo/README.md" "$repo"/docs/*.md "$repo"/workflows/*.md "$repo"/templates/*.md; do
+  [ -f "$f" ] || continue
+  bad="$(grep -oiE '[0-9]+ +(базов[а-я]* )?(способност[а-я]*|направлени[а-я]*)' "$f" \
+        | grep -viE "^($real_caps|$real_cl) " || true)"
+  badw="$(grep -oiE '(дв[ае]|тр[иё]х?|четыр[её]х?|пят[ьи]|шест[ьи]|сем[ьи]|восем[ьи]|девят[ьи]|десят[ьи]|одиннадцат[ьи]|двенадцат[ьи]|тринадцат[ьи]|четырнадцат[ьи]|пятнадцат[ьи]|шестнадцат[ьи]) +(базов[а-я]* )?(способност[а-я]*|направлени[а-я]*|вопрос[а-я]*)' "$f" \
+        | grep -viE "^($right_word|$right_cl_word)" || true)"
+  [ -z "$bad" ] && [ -z "$badw" ] || {
+    echo "СБОРКА ОСТАНОВЛЕНА: $(basename "$f") называет другое число: $bad $badw"; exit 1; }
 done
 echo "гейт: $real_caps способностей, $real_cl направлений — документы согласованы"
 
