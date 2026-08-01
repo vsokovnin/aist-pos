@@ -84,6 +84,7 @@ def main():
         fail("в странице внешние адреса: " + ", ".join(external[:3]))
 
     out = out.replace("<head>", "<head>\n<!-- собрано навыком AIST POS %s -->" % version, 1)
+    out = out.replace('const SKILL_VERSION = "dev";', 'const SKILL_VERSION = "%s";' % version, 1)
     out_path.write_text(out, encoding="utf-8")
     repeat = any(c["level"] != c["levelNow"] for c in caps)
     print("страница:", out_path.resolve())

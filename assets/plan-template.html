@@ -917,6 +917,7 @@ const DATA = {
 };
 /* конец DATA */
 
+const SKILL_VERSION = "dev";   /* подставляется сборщиком */
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -939,11 +940,13 @@ $("#hSub").textContent = "Где система была, где она сейч
 $("#hMeta").innerHTML = [
   ["Имя", DATA.meta.name],
   ["Роль", DATA.meta.role],
-  ["Оценка", DATA.meta.labelWas + " → " + DATA.meta.labelNow],
+  ["Оценка", DATA.capabilities.some(c => c.levelNow !== c.level)
+      ? DATA.meta.labelWas + " → " + DATA.meta.labelNow : DATA.meta.labelNow],
   ["Версия", "v" + DATA.meta.planVersion]
 ].map(([l,v]) => "<div><span>" + esc(l) + "</span><b>" + esc(v) + "</b></div>").join("");
 if (DATA.meta.provenance) $("#hProv").textContent = DATA.meta.provenance; else $("#hProv").hidden = true;
-$("#foot").textContent = "AIST POS · зрелость личной ОС · " + DATA.meta.date + " · v" + DATA.meta.planVersion;
+$("#foot").textContent = "AIST POS · навык " + SKILL_VERSION + " · зрелость личной ОС · " +
+  DATA.meta.date + " · план v" + DATA.meta.planVersion;
 
 /* tiles */
 const belowWas = DATA.capabilities.filter(c => c.level < 3).length;
