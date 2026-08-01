@@ -11,8 +11,9 @@ import re
 import sys
 from pathlib import Path
 
-CAPS = ["memory", "context_seed", "naming", "root_file", "git",
-        "source_map", "connectors", "capture", "graph"]
+CAPS = ["memory", "context_seed", "naming", "root_file", "git", "source_map",
+        "connectors", "capture", "graph", "doc_source", "playbook", "quality",
+        "output_form", "research", "decision_log", "handover"]
 REQUIRED = ["meta", "stageWas", "stageNow", "directions", "weakNote", "capabilities",
             "moved", "pinned", "mainStep", "nextSteps", "inspection", "signals",
             "reassess", "journal"]
@@ -44,7 +45,7 @@ def main():
     caps = data["capabilities"]
     ids = [c.get("id") for c in caps]
     if sorted(ids) != sorted(CAPS):
-        fail("нужны ровно девять способностей: " + ", ".join(CAPS))
+        fail("нужны ровно шестнадцать способностей: " + ", ".join(CAPS))
     for c in caps:
         for key in ("level", "levelNow"):
             if not isinstance(c.get(key), int) or not 1 <= c[key] <= 5:

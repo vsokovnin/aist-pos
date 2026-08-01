@@ -21,9 +21,9 @@
 meta        name, role, date, planVersion, labelWas, labelNow, provenance
 stageWas    { n, score, name, desc }   — прошлая оценка; на первой равна stageNow
 stageNow    { n, score, name, desc }   — имена стадий из rubric/stage-map.yaml
-directions  [ { id, title } ]          — три направления рубрики
+directions  [ { id, title } ]          — пять направлений рубрики
 weakNote    почему слабое направление это критический путь
-capabilities[ { id, dir, title, short, level, levelNow } ]  — все девять
+capabilities[ { id, dir, title, short, level, levelNow } ]  — все шестнадцать
 moved       [ { cap, from, to, proof } ]  — пусто на первой оценке
 mainStep    { kicker, title, why }
 pinned      [ id набора ] — два-три рекомендованных; остальные видны в библиотеке
