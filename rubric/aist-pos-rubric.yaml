@@ -1,6 +1,5 @@
-# AIST POS consumer rubric — 16 способностей в 5 направлениях.
-# Девять базовых — проекция 40-cap CMM; семь добавлены 01.08.2026 под библиотеку наборов.
-# scale: CMM L1-L5 (фикс).
+# Рубрика AIST POS — 16 способностей в 5 направлениях.
+# Шкала уровней 1-5 по каждой способности; формулировки уровней — в levels.
 # профиль = per-cap уровни; в каждом кластере помечается слабое звено (самый низкий cap) — диагностический флаг, НЕ агрегат.
 # headline-стадия (гибрид) = round(mean(cluster_avg)); слабое звено (min cluster_avg) показывается отдельно — см. stage-map.yaml.
 meta:
@@ -28,7 +27,7 @@ clusters:
     caps: [research, decision_log]
 
 capabilities:
-  - id: memory            # CMM #12
+  - id: memory
     cluster: context
     title: "Память агента"
     inspect:
@@ -45,7 +44,7 @@ capabilities:
       to_L3: "Заведи файл памяти агента с двумя разделами: что у меня есть и где · как я люблю работать"
       native: "Нативно быстрее: плагин Productivity (двухуровневая память + захват из разговоров)."
 
-  - id: context_seed      # CMM #17
+  - id: context_seed
     cluster: context
     title: "Вводные под задачу"
     inspect:
@@ -61,7 +60,7 @@ capabilities:
     actions:
       to_L3: "Опиши в файле-памятке: кто я, как работать, чего не делать"
 
-  - id: naming            # CMM #24
+  - id: naming
     cluster: files
     title: "Правило имён файлов"
     inspect:
@@ -77,7 +76,7 @@ capabilities:
     actions:
       to_L3: "Заведи единое правило имён файлов ({проект} {тип} описание — дата) и пропиши его в файл-памятку"
 
-  - id: root_file         # CMM #38
+  - id: root_file
     cluster: files
     title: "Файл-памятка для агента"
     inspect:
@@ -93,7 +92,7 @@ capabilities:
     actions:
       to_L3: "Создай файл-памятку для агента: куда что класть, где искать, чего не делать"
 
-  - id: git               # CMM #39
+  - id: git
     cluster: files
     title: "Сохранность и история изменений"
     inspect:
@@ -109,7 +108,7 @@ capabilities:
     actions:
       to_L3: "Настрой автоматическую историю изменений + копию отдельно от компьютера"
 
-  - id: source_map        # CMM #40
+  - id: source_map
     cluster: files
     title: "Что где лежит и что конфиденциально"
     inspect:
@@ -125,7 +124,7 @@ capabilities:
     actions:
       to_L3: "Составь список: где что лежит и что из этого конфиденциально"
 
-  - id: connectors        # CMM #18
+  - id: connectors
     cluster: files
     title: "Подключение сервисов"
     inspect:
@@ -142,7 +141,7 @@ capabilities:
       to_L3: "Подключи почту и календарь к агенту"
       native: "Нативные Connectors Claude: Google Workspace (дефолт для индивида) или M365 (enterprise, read-only)."
 
-  - id: capture           # CMM #11
+  - id: capture
     cluster: capture
     title: "Разбор входящих"
     inspect:
@@ -159,7 +158,7 @@ capabilities:
       to_L3: "Настрой, чтобы письма, сообщения и транскрипты сами собирались и разбирались в задачи и заметки"
       native: "Нативно быстрее: Productivity (/update --comprehensive) или Enterprise search для разбора входящих."
 
-  - id: graph             # CMM #13
+  - id: graph
     cluster: capture
     title: "База контактов"
     inspect:
