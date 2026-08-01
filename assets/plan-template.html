@@ -165,29 +165,63 @@ tr:last-child td{border-bottom:none}
   color:var(--subtle);flex:none;align-self:flex-start;padding-top:3px;white-space:nowrap}
 .rung.here .tag{color:var(--primary-deep)}
 
-.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center}
 .chip{font-size:12.5px;padding:5px 11px;border-radius:6px;border:1px solid var(--border);
   background:var(--card);color:var(--muted-foreground);cursor:pointer;
   transition:background 160ms var(--ease)}
 .chip.on{border-color:var(--primary);color:var(--primary-deep);background:var(--primary-soft)}
 .chip:active{transform:scale(.97)}
-.fsep{width:1px;height:18px;background:var(--border);margin:0 6px}
-.fcount{font-size:12.5px;color:var(--subtle);margin-left:auto}
-.strip{border:1px solid var(--border);border-left:3px solid var(--success);
-  border-radius:var(--radius-sm);background:var(--card);padding:12px 16px;
-  margin-bottom:16px;font-size:13.5px;color:var(--muted-foreground)}
-.step{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card);
-  padding:15px 18px;margin-bottom:9px;display:flex;gap:14px;align-items:flex-start}
-.step input{margin:3px 0 0;width:16px;height:16px;accent-color:var(--primary);flex:none}
-.step .body{flex:1;min-width:0}
-.step .ttl{font-weight:500}
-.step .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;align-items:center}
-.step .why{font-size:13px;color:var(--muted-foreground);margin-top:6px}
-.step .native{font-size:13px;color:var(--primary-deep);margin-top:7px}
-.step.done{opacity:.55}
-.step.done .ttl{text-decoration:line-through}
-#moreBtn{width:100%;margin-top:2px;border-style:dashed;color:var(--muted-foreground)}
 
+.subhead{font-size:11px;text-transform:uppercase;letter-spacing:.11em;color:var(--subtle);
+  font-weight:600;margin:22px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.set{position:relative;text-align:left;font:inherit;color:inherit;cursor:pointer;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0;
+  transition:border-color 160ms var(--ease),background 160ms var(--ease)}
+.set:active{transform:scale(.995)}
+.set.pinned{border-color:var(--primary)}
+.set.done{opacity:.62}
+.ico{width:26px;height:26px;color:var(--primary);flex:none}
+.set.done .ico{color:var(--success-deep)}
+.set h4{font-family:var(--font-display);font-size:16px;font-weight:600;
+  letter-spacing:-.01em;line-height:1.3;margin:0}
+.set p{margin:0;font-size:14px;color:var(--muted-foreground)}
+.set .foot{margin-top:auto;padding-top:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.prog{font-size:12.5px;color:var(--muted-foreground);font-variant-numeric:tabular-nums}
+.prog b{color:var(--foreground);font-weight:500}
+.pbar{flex:1;min-width:60px;height:4px;border-radius:3px;background:var(--secondary);
+  position:relative;overflow:hidden}
+.pbar i{position:absolute;top:0;bottom:0;left:0;background:var(--primary);border-radius:3px}
+.tag{position:absolute;top:16px;right:16px;font-size:10px;text-transform:uppercase;
+  letter-spacing:.1em;font-weight:600;color:var(--primary-deep);
+  background:var(--primary-soft);border-radius:5px;padding:3px 7px}
+.set.done .tag{color:var(--success-deep);background:rgba(22,163,74,.10)}
+.set.done .pbar i{background:var(--success)}
+.more{font-size:12.5px;color:var(--primary-deep);opacity:0;transition:opacity 160ms var(--ease)}
+dialog{border:none;border-radius:var(--radius-lg);padding:0;max-width:560px;
+  width:calc(100% - 32px);background:var(--card);color:var(--foreground)}
+dialog::backdrop{background:rgba(17,17,17,.42)}
+.mhead{padding:26px 28px 18px;border-bottom:1px solid var(--border);
+  display:flex;gap:14px;align-items:flex-start}
+.mhead .ico{width:30px;height:30px}
+.mhead h3{font-size:21px;font-weight:600;letter-spacing:-.015em;line-height:1.25}
+.mbody{padding:22px 28px 8px}
+.mbody h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--subtle);
+  font-weight:600;margin:0 0 8px;font-family:var(--font-body)}
+.mbody p{margin:0 0 20px;color:var(--muted-foreground)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.chips .chip{font-size:12.5px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);
+  color:var(--muted-foreground);background:var(--card);cursor:default}
+.chips .chip.ok{border-color:transparent;background:rgba(22,163,74,.10);color:var(--success-deep)}
+.msteps{margin:0 0 20px;padding:0;list-style:none}
+.msteps li{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--border);font-size:14px}
+.msteps li:first-child{border-top:none}
+.msteps .n{font-family:var(--font-mono);font-size:12px;color:var(--subtle);padding-top:2px}
+.msteps .eff{margin-left:auto;font-size:11px;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--subtle);white-space:nowrap;padding-top:3px}
+.mfoot{padding:16px 28px 24px;display:flex;gap:10px;align-items:center;border-top:1px solid var(--border)}
+button.ghost{font-size:14px;padding:9px 16px}
+.note{margin-left:auto;font-size:12.5px;color:var(--subtle)}
 .check{display:flex;gap:12px;align-items:flex-start;padding:11px 0;
   border-top:1px solid var(--border);font-size:14px;cursor:pointer}
 .check:first-child{border-top:none}
@@ -214,7 +248,11 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
   .chip:hover{background:var(--secondary)}
   tbody tr:hover td{background:var(--secondary)}
   .cap>summary:hover{background:var(--secondary)}
+  .set:hover{border-color:var(--rule);background:#FCFDFE}
+  .set:hover .more{opacity:1}
 }
+@media (max-width:960px){ .grid{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:620px){ .grid{grid-template-columns:1fr} }
 @media (max-width:1024px){
   .tiles{grid-template-columns:repeat(2,1fr)}
   .tile:nth-child(2n){border-right:none}
@@ -232,8 +270,7 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media print{
-  nav,#exportBtn,.chip,.filters,.vswitch,#moreBtn{display:none}
-  body{background:#fff}
+  nav,#exportBtn,.chip,.filters,.vswitch,  body{background:#fff}
   section{break-inside:avoid;page-break-inside:avoid}
   .cap{break-inside:avoid}
 }
@@ -261,6 +298,15 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
   <div class="tiles" id="tiles"></div>
   <div class="moved" id="movedBox"></div>
   <div class="mainstep" id="mainStep"></div>
+</section>
+
+<section id="sets">
+  <div class="sechead"><h2>Что вы хотите закрыть первым</h2></div>
+  <p class="lead">Набор — не список файлов, которые надо завести, а задача, которая после него делается сама. Шаг, сделанный в одном наборе, засчитывается в остальных.</p>
+  <h3 class="subhead" id="recHead">Рекомендуем вам</h3>
+  <div class="grid" id="gridRec"></div>
+  <h3 class="subhead">Вся библиотека</h3>
+  <div class="grid" id="gridAll"></div>
 </section>
 
 <section id="diagnoz">
@@ -299,15 +345,6 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
   <div id="capList"></div>
 </section>
 
-<section id="plan">
-  <div class="sechead"><h2>Что дальше</h2></div>
-  <p class="lead">Только то, что идёт вперёд, по возрастанию слабости. Уже закрытое сюда не попадает — оно в блоке «что сдвинулось».</p>
-  <div class="strip" id="planStrip"></div>
-  <div class="filters" id="filters"></div>
-  <div id="stepList"></div>
-  <button id="moreBtn" hidden></button>
-</section>
-
 <section id="signaly">
   <div class="sechead"><h2>Как поймём, что работает</h2></div>
   <p class="lead">Установить и пользоваться — разные вещи. Левая колонка означает, что основа заведена. Правая — что способность реально живёт: эти признаки агент проставляет сам по ходу работы.</p>
@@ -329,6 +366,25 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
 </section>
 
 <footer id="foot"></footer>
+</div>
+
+<dialog id="dlg">
+  <div class="mhead"><span class="ico" id="mIco"></span><h3 id="mTitle"></h3></div>
+  <div class="mbody">
+    <h4>Что изменится</h4>
+    <p id="mPromise"></p>
+    <h4>Из чего собирается</h4>
+    <div class="chips" id="mChips"></div>
+    <h4 id="mStepsHead">Осталось сделать</h4>
+    <ul class="msteps" id="mSteps"></ul>
+  </div>
+  <div class="mfoot">
+    <button class="ghost" id="mClose">Закрыть</button>
+    <span class="note" id="mNote"></span>
+  </div>
+</dialog>
+
+<div style="display:none">
 </div>
 
 <div class="toast" id="toast"></div>
@@ -383,6 +439,87 @@ const LADDERS = {
               "Всё поддерживается само: если данные о ком-то разошлись по разным местам — это замечается, а дубликаты сливаются в одну карточку"],
 };
 
+/* Значки наборов — канон, при генерации не трогать. */
+const ICONS = {
+  digest:'<path d="M4 6h16M4 12h10M4 18h13"/><circle cx="19" cy="12" r="2"/>',
+  people:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.4"/><path d="M3.5 19c.6-3 3-4.6 5.5-4.6S14 16 14.6 19M15.5 19c.3-2 1.6-3.2 3.3-3.2 1.2 0 2.2.5 2.9 1.4"/>',
+  check:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.2l2.6 2.6 4.6-5"/>',
+  pen:'<path d="M5 19h4l9.5-9.5a2 2 0 0 0-2.8-2.8L6 16v3z"/><path d="M14 7.5l2.5 2.5"/>',
+  handout:'<path d="M6 4h8l4 4v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M14 4v4h4"/><path d="M9 15h6M9 12h4"/>',
+  board:'<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 12l2.5-2.5L12 12l4-4"/>',
+  doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><circle cx="11" cy="13" r="3"/><path d="M13.2 15.2L16 18"/>',
+  quarter:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M9 15.5l2 2 4-4.5"/>',
+  chart:'<path d="M4 20V4"/><path d="M4 20h16"/><rect x="8" y="12" width="3" height="5"/><rect x="13" y="8" width="3" height="9"/><rect x="18" y="14" width="3" height="3"/>',
+  dossier:'<circle cx="11" cy="10" r="6"/><path d="M15.5 14.5L21 20"/><path d="M8.5 12.5c.7-1.2 1.6-1.8 2.5-1.8s1.8.6 2.5 1.8"/><circle cx="11" cy="8" r="1.6"/>',
+  slides:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><path d="M8 11l2.5-2.5L13 11l3-3"/>',
+  keys:'<circle cx="8" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/><circle cx="17.5" cy="9.5" r="2.5"/><path d="M17.5 12v6M16 15.5h3M16 18h3"/>'
+};
+const icon = k => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" ' +
+  'stroke-linecap="round" stroke-linejoin="round" width="100%" height="100%">' + (ICONS[k] || "") + '</svg>';
+
+/* Каталог наборов и названия способностей — канон, при генерации не трогать.
+   Персональное в DATA: какие наборы рекомендованы (pinned) и какие шаги открыты. */
+const CAP_TITLES = {
+  memory:"Память агента", context_seed:"Вводные под задачу", naming:"Правило имён файлов",
+  root_file:"Файл-памятка", git:"Сохранность и история изменений",
+  source_map:"Что где лежит и что конфиденциально", connectors:"Подключение сервисов",
+  capture:"Разбор входящих", graph:"База контактов", doc_source:"Работа с документом",
+  playbook:"Свой порядок под задачу", quality:"Проверяемость результата",
+  output_form:"Форма результата", decision_log:"Журнал решений и целей",
+  research:"Внешний поиск с источниками", handover:"Работа не в одиночку"
+};
+
+const SETS = [
+  { id:"day", icon:"digest", title:"День начинается с одной сводки",
+    short:"Утром одна сводка вместо обхода почты, календаря и мессенджеров.",
+    promise:"Вы открываете одну страницу и видите: какие сегодня встречи, какие письма ждут ответа и что висит на вас с прошлой недели. Не открываете пять вкладок и ничего не выискиваете.",
+    caps:["connectors","capture","playbook"] },
+  { id:"meet", icon:"people", title:"К встрече готов за пять минут",
+    short:"Кто эти люди, что между вами было и о чём говорить — до того, как вы вошли.",
+    promise:"За пять минут до разговора вы знаете, кто эти люди и из какой они компании, что между вами было в прошлый раз, что висит с той встречи и о чём имеет смысл говорить сегодня.",
+    caps:["connectors","capture","graph","playbook"] },
+  { id:"promises", icon:"check", title:"Ничего не забыто",
+    short:"Что обещали вы и что обещали вам — не держится в голове.",
+    promise:"Обязательства из писем и встреч сами оказываются в списке: отдельно ваши, отдельно те, что ждёте вы. Просроченное сверху. Ничего не всплывает через неделю в неудобный момент.",
+    caps:["connectors","capture","graph"] },
+  { id:"draft", icon:"pen", title:"Черновик ответа готов к отправке",
+    short:"Письмо, согласование или отказ приходят готовыми к правке.",
+    promise:"Вы говорите «ответь по договору» — и получаете черновик в вашем тоне, с учётом прошлой переписки и того, что вы уже обещали. Остаётся прочитать и отправить.",
+    caps:["graph","memory","context_seed","playbook","output_form"] },
+  { id:"followup", icon:"handout", title:"После встречи итоги уже разосланы",
+    short:"Решения и поручения оформлены, пока все помнят разговор.",
+    promise:"Через десять минут после встречи готовы итоги: что решили, кто что делает и к какому сроку — в том виде, в котором это можно сразу отправить участникам.",
+    caps:["capture","graph","output_form"] },
+  { id:"board", icon:"board", title:"К совету: повестка, материалы, вопросы",
+    short:"Материалы разобраны, повестка собрана, вопросы сформулированы.",
+    promise:"Материалы к заседанию разобраны за вас: что изменилось с прошлого раза, где цифры расходятся, какие вопросы стоит задать менеджменту и по каким пунктам вы обещали вернуться.",
+    caps:["doc_source","playbook","graph","quality"] },
+  { id:"report", icon:"doc", title:"Отчёт за двадцать минут, а не за вечер",
+    short:"Восемьдесят страниц превращаются в разбор со ссылками на страницы.",
+    promise:"Пришёл финансовый отчёт или пакет материалов — вместо вечера чтения вы получаете разбор: главное, что настораживает, и где именно это написано. Каждая цифра проверяема.",
+    caps:["doc_source","quality","playbook"] },
+  { id:"quarter", icon:"quarter", title:"Квартал закрыт: цели, факт, выводы",
+    short:"Период подведён числами, решения зафиксированы.",
+    promise:"В конце периода видно, что планировали и что вышло, какие решения принимали и почему. Через квартал вы открываете журнал и понимаете логику прошлого себя.",
+    caps:["playbook","memory","decision_log","output_form"] },
+  { id:"market", icon:"chart", title:"Обзор рынка с проверяемыми источниками",
+    short:"Картина по рынку и конкурентам, где у каждого утверждения виден источник.",
+    promise:"Вы получаете обзор по рынку или конкуренту, в котором каждое утверждение подкреплено ссылкой, а не выдумано. Следующий обзор строится поверх предыдущего.",
+    caps:["research","quality","playbook"] },
+  { id:"dossier", icon:"dossier", title:"Досье за десять минут",
+    short:"Кто эта компания или человек — до того, как вы сели за стол.",
+    promise:"Перед первой встречей или сделкой у вас на руках: чем занимается компания, кто принимает решения, что о них известно публично и на что обратить внимание.",
+    caps:["research","graph","quality"] },
+  { id:"deck", icon:"slides", title:"Из заметок в готовые слайды",
+    short:"Путь от идей до выступления без ручной пересборки формата.",
+    promise:"Ваши заметки и материалы собираются в структуру выступления и дальше в слайды. Вы правите содержание, а не переносите текст из формата в формат.",
+    caps:["playbook","memory","output_form"] },
+  { id:"assistant", icon:"keys", title:"Ассистент работает в вашей системе",
+    short:"Другой человек входит в систему и не ломает её, не видя лишнего.",
+    promise:"Ассистент или секретарь работает по вашим правилам: знает, куда что класть и где искать, и при этом не видит того, что видеть не должен.",
+    caps:["root_file","source_map","naming","handover"] }
+];
+
 /* DATA */
 /* Образец первой оценки. Агент заменяет весь объект целиком — см. workflows/page.md. */
 const DATA = {
@@ -414,13 +551,13 @@ const DATA = {
     { id:"capture", dir:"capture", title:"Разбор входящих", short:"Входящие", level:2, levelNow:2, },
     { id:"graph", dir:"capture", title:"База контактов", short:"Контакты", level:1, levelNow:1, }
   ],
+  pinned: ["day", "meet", "promises"],
   moved: [],
   mainStep: {
     kicker: "Главный шаг — сделать сейчас",
     title: "Создайте файл-памятку для агента: куда что класть, где искать, чего не делать",
     why: "Первым — потому что это указатель, на который опираются остальные шаги. Займёт около пятнадцати минут, шаблон дам."
   },
-  planStrip: "",
   nextSteps: [
     { id:"s-root_file", cap:"root_file", dir:"files", effort:"15 минут",
       title:"Создайте файл-памятку для агента: куда что класть, где искать, чего не делать",
@@ -492,8 +629,8 @@ $("#tiles").innerHTML = [
         (DATA.stageNow.score - DATA.stageWas.score).toFixed(1) + "</b>" : DATA.stageNow.desc },
   { v: String(belowNow), l: "Способностей ниже базовой",
     n: isRepeat ? "было " + belowWas : "из " + DATA.capabilities.length },
-  { v: String(DATA.nextSteps.length), l: "Шагов в плане",
-    n: isRepeat ? "" : "начните с первого" }
+  { v: String(SETS.filter(s => setCapsOpen(s).length).length), l: "Наборов открыто",
+    n: "из " + SETS.length }
 ].map(t => '<div class="tile"><div class="v">' + t.v + '</div><div class="l">' + esc(t.l) +
   '</div><div class="n">' + t.n + "</div></div>").join("");
 
@@ -599,52 +736,58 @@ $(".vswitch").addEventListener("click", e => {
   renderCaps(b.dataset.view);
 });
 
-/* plan */
-const SHOWN = 3;
-const EFFORTS = ["15 минут", "вечер", "выходные"];
-let fDir = "all", fEff = "all", expanded = false;
-if (DATA.planStrip) $("#planStrip").textContent = DATA.planStrip; else $("#planStrip").hidden = true;
-$("#filters").innerHTML =
-  '<button class="chip on" data-f="dir" data-v="all">Все направления</button>' +
-  DATA.directions.map(d => '<button class="chip" data-f="dir" data-v="' + d.id + '">' +
-    esc(dirShort(d.id)) + "</button>").join("") +
-  '<span class="fsep"></span>' +
-  '<button class="chip on" data-f="eff" data-v="all">Любое время</button>' +
-  EFFORTS.map(e => '<button class="chip" data-f="eff" data-v="' + e + '">' + esc(e) + "</button>").join("") +
-  '<span class="fcount" id="fcount"></span>';
+/* наборы */
+const capLevel = id => (capById(id) || { levelNow: 0 }).levelNow;
+const setCapsOpen = s => s.caps.filter(c => capLevel(c) < 3);
+const setStepsOpen = s => setCapsOpen(s)
+  .map(c => DATA.nextSteps.find(x => x.cap === c))
+  .filter(Boolean);
 
-function renderSteps(){
-  // Только шаги вперёд: закрытое живёт в блоке «что сдвинулось», в списке дел ему не место.
-  const vis = DATA.nextSteps.filter(s =>
-    (fDir === "all" || s.dir === fDir) && (fEff === "all" || s.effort === fEff));
-  const shown = expanded ? vis : vis.slice(0, SHOWN);
-  $("#stepList").innerHTML = shown.map(s => {
-    const cap = capById(s.cap);
-    const done = !!store[s.id];
-    return '<div class="step' + (done ? " done" : "") + '"><input type="checkbox" data-ls="' + s.id +
-      '"' + (done ? " checked" : "") + ' aria-label="Сделано">' +
-      '<div class="body"><div class="ttl">' + esc(s.title) + '</div>' +
-      '<div class="why">' + esc(s.why) + "</div>" +
-      (s.native ? '<div class="native">' + esc(s.native) + "</div>" : "") +
-      '<div class="meta"><span class="badge">' + esc(dirShort(s.dir)) +
-      '</span><span class="badge">' + esc(s.effort) + '</span><span class="badge">сейчас ' +
-      cap.levelNow + " из 5 → 5</span></div></div></div>";
-  }).join("") || '<p class="lead">Под этот фильтр шагов нет.</p>';
-  const rest = vis.length - shown.length;
-  const btn = $("#moreBtn");
-  btn.hidden = rest <= 0 && !expanded;
-  if (!btn.hidden) btn.textContent = expanded ? "Свернуть" : "Показать ещё " + rest;
-  $("#fcount").textContent = vis.length + " из " + DATA.nextSteps.length;
+const isPinned = s => (DATA.pinned || []).includes(s.id);
+
+function setCard(s){
+  const total = s.caps.length, open = setCapsOpen(s).length, done = open === 0;
+  return '<button class="set' + (isPinned(s) ? " pinned" : "") + (done ? " done" : "") +
+    '" data-set="' + s.id + '">' +
+    (isPinned(s) ? '<span class="tag">рекомендуем</span>' : done ? '<span class="tag">работает</span>' : "") +
+    '<span class="ico">' + icon(s.icon) + "</span>" +
+    "<h4>" + esc(s.title) + "</h4><p>" + esc(s.short) + "</p>" +
+    '<div class="foot"><span class="prog">' +
+      (done ? "все шаги закрыты" : "осталось <b>" + open + "</b> из " + total) +
+    '</span><span class="pbar"><i style="width:' + ((total - open) / total * 100) + '%"></i></span>' +
+    '<span class="more">подробнее</span></div></button>';
 }
-renderSteps();
-$("#moreBtn").addEventListener("click", () => { expanded = !expanded; renderSteps(); });
-$("#filters").addEventListener("click", e => {
-  const b = e.target.closest(".chip"); if (!b) return;
-  if (b.dataset.f === "dir") fDir = b.dataset.v; else fEff = b.dataset.v;
-  $$('.chip[data-f="' + b.dataset.f + '"]').forEach(c => c.classList.toggle("on", c === b));
-  expanded = false;
-  renderSteps();
+
+const pinnedSets = SETS.filter(isPinned);
+$("#gridRec").innerHTML = pinnedSets.map(setCard).join("");
+if (!pinnedSets.length) { $("#gridRec").hidden = true; $("#recHead").hidden = true; }
+$("#gridAll").innerHTML = SETS.map(setCard).join("");
+
+const dlg = $("#dlg");
+document.addEventListener("click", e => {
+  const b = e.target.closest(".set"); if (!b) return;
+  const s = SETS.find(x => x.id === b.dataset.set); if (!s) return;
+  $("#mIco").innerHTML = icon(s.icon);
+  $("#mTitle").textContent = s.title;
+  $("#mPromise").textContent = s.promise;
+  $("#mChips").innerHTML = s.caps.map(c => {
+    const cap = capById(c), ok = capLevel(c) >= 3;
+    return '<span class="chip' + (ok ? " ok" : "") + '">' +
+      esc(cap ? cap.title : (CAP_TITLES[c] || c)) + (ok ? " — есть" : "") + "</span>";
+  }).join("");
+  const open = setStepsOpen(s);
+  $("#mStepsHead").textContent = open.length ? "Осталось сделать" : "Всё сделано";
+  $("#mSteps").innerHTML = open.length
+    ? open.map((st, i) => '<li><span class="n">' + (i + 1) + "</span><span>" + esc(st.title) +
+        '</span><span class="eff">' + esc(st.effort) + "</span></li>").join("")
+    : (setCapsOpen(s).length
+        ? '<li><span class="n">—</span><span>Шаги по этому набору появятся, когда оценка охватит все его способности.</span></li>'
+        : "");
+  $("#mNote").textContent = open.length ? "шагов: " + open.length : "";
+  dlg.showModal();
 });
+$("#mClose").addEventListener("click", () => dlg.close());
+dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
 
 /* signals */
 $("#sigBody").innerHTML = DATA.signals.map(s =>
@@ -672,8 +815,8 @@ document.addEventListener("change", e => {
 });
 
 /* nav + numbering */
-const NAV = [["svodka","Сейчас"],["diagnoz","Профиль"],["uvidel","Что видно"],["rost","Куда расти"],
-  ["plan","Что дальше"],["signaly","Сигналы"],["reassess","Следующая оценка"],["journal","Журнал"]];
+const NAV = [["svodka","Сейчас"],["sets","Наборы"],["diagnoz","Профиль"],["uvidel","Что видно"],
+  ["rost","Куда расти"],["signaly","Сигналы"],["reassess","Следующая оценка"],["journal","Журнал"]];
 $("#navLinks").innerHTML = NAV.filter(([id]) => {
   const el = document.getElementById(id); return el && !el.hidden;
 }).map(([id,l]) => '<a href="#' + id + '">' + l + "</a>").join("");

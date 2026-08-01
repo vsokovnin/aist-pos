@@ -14,8 +14,10 @@ from pathlib import Path
 CAPS = ["memory", "context_seed", "naming", "root_file", "git",
         "source_map", "connectors", "capture", "graph"]
 REQUIRED = ["meta", "stageWas", "stageNow", "directions", "weakNote", "capabilities",
-            "moved", "mainStep", "planStrip", "nextSteps", "inspection", "signals",
+            "moved", "pinned", "mainStep", "nextSteps", "inspection", "signals",
             "reassess", "journal"]
+SETS = ["day", "meet", "promises", "draft", "followup", "board", "report",
+        "quarter", "market", "dossier", "deck", "assistant"]
 
 
 def fail(msg):
@@ -50,6 +52,15 @@ def main():
         if "ladder" in c:
             fail("лестницы уже в шаблоне — уберите поле ladder у %s" % c["id"])
 
+    unknown = [p for p in data["pinned"] if p not in SETS]
+    if unknown:
+        fail("в pinned неизвестные наборы: " + ", ".join(unknown))
+    for st in data["nextSteps"]:
+        if st.get("cap") not in CAPS:
+            fail("шаг %s ссылается на неизвестную способность %s" % (st.get("id"), st.get("cap")))
+        if not any(c["id"] == st["cap"] and c["levelNow"] < 3 for c in caps):
+            fail("шаг %s висит на способности, которая уже закрыта или отсутствует" % st.get("id"))
+
     html = template.read_text(encoding="utf-8")
     block = "/* DATA */\nconst DATA = %s;\n/* конец DATA */" % json.dumps(
         data, ensure_ascii=False, indent=2)
@@ -67,7 +78,7 @@ def main():
     repeat = any(c["level"] != c["levelNow"] for c in caps)
     print("страница:", out_path.resolve())
     print("стадия:  %s (%s)" % (data["stageNow"]["n"], data["stageNow"]["name"]))
-    print("шагов:   %s" % len(data["nextSteps"]))
+    print("шагов:   %s · наборов рекомендовано: %s" % (len(data["nextSteps"]), len(data["pinned"])))
     print("серий на радаре:", 2 if repeat else 1)
 
 
