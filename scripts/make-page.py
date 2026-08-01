@@ -62,6 +62,14 @@ def main():
         if not any(c["id"] == st["cap"] and c["levelNow"] < 3 for c in caps):
             fail("шаг %s висит на способности, которая уже закрыта или отсутствует" % st.get("id"))
 
+    skill_md = Path(__file__).resolve().parent.parent / "SKILL.md"
+    version = "неизвестна"
+    if skill_md.exists():
+        for line in skill_md.read_text(encoding="utf-8").splitlines():
+            if line.startswith("version:"):
+                version = line.split(":", 1)[1].strip()
+                break
+
     html = template.read_text(encoding="utf-8")
     block = "/* DATA */\nconst DATA = %s;\n/* конец DATA */" % json.dumps(
         data, ensure_ascii=False, indent=2)
@@ -75,9 +83,11 @@ def main():
     if external:
         fail("в странице внешние адреса: " + ", ".join(external[:3]))
 
+    out = out.replace("<head>", "<head>\n<!-- собрано навыком AIST POS %s -->" % version, 1)
     out_path.write_text(out, encoding="utf-8")
     repeat = any(c["level"] != c["levelNow"] for c in caps)
     print("страница:", out_path.resolve())
+    print("версия:  %s" % version)
     print("стадия:  %s (%s)" % (data["stageNow"]["n"], data["stageNow"]["name"]))
     print("шагов:   %s · наборов рекомендовано: %s" % (len(data["nextSteps"]), len(data["pinned"])))
     print("серий на радаре:", 2 if repeat else 1)
