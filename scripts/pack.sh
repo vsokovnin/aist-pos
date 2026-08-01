@@ -26,8 +26,11 @@ assets
 config
 docs
 examples
+scripts
 ITEMS
 
+# pack.sh — инструмент сборки, человеку он не нужен
+rm -f "$stage/$name/scripts/pack.sh"
 find "$stage" -name '.DS_Store' -delete
 find "$stage" -name 'aist-pos.config.yaml' -delete
 
