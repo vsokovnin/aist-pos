@@ -3,3 +3,4 @@ runtime/
 .env
 *.key
 .DS_Store
+dist/
