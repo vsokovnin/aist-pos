@@ -1,17 +1,27 @@
-# AIST POS — пользовательский конфиг (копируется в aist-pos.config.yaml на /setup).
-# Портативный: ноль приватной инфры. Скилы читают ТОЛЬКО этот файл + connectors.md.
+# AIST POS — пользовательский конфиг (копируется в aist-pos.config.yaml при первом запуске).
+# Портативный: ноль приватной инфраструктуры. Потоки читают ТОЛЬКО этот файл + connectors.md.
 identity:
-  name: "<ваше имя>"
-  role: "<роль, напр. член совета директоров>"
+  name: ""                 # заполняется в конце первой оценки
+  role: ""                 # напр. член совета директоров
   timezone: "Europe/Moscow"
-horizon_days: 7            # окно разбора входящих / брифа
-connectors:                # значения резолвятся через connectors.md
-  email: none              # gmail | outlook | none
-  calendar: none           # gmail | outlook | none
-  messenger: none          # telegram | none
-  transcripts: none        # granola | plaud | local | none
-output_surface: file       # telegram | file
-stores:                    # относительные пути (от рабочей папки пользователя)
-  entities: entities/      # база контактов (граф): организация <- люди, проекты
-  tasks: runtime/tasks.md  # вывод задач и обязательств (US1)
-  brief: runtime/brief.md  # вывод брифа (US2)
+
+horizon_days: 7            # окно разбора входящих и брифа
+
+# Значения резолвятся через connectors.md. none — источник пропускается, поток не падает.
+connectors:
+  email: none              # yandex | mailru | gmail | outlook | none
+  calendar: none           # yandex | bitrix24 | gmail | outlook | none
+  messenger: none          # telegram | max | pachca | vkteams | express | none
+  transcripts: none        # kontur-talk | sberjazz | telemost | granola | plaud | local | none
+  documents: local         # local | yandex-disk | mailru-cloud — откуда берутся входящие документы
+  search: none             # native | yandex | none — внешний поиск для обзоров и досье
+  knowledge: local         # local | yonote | weeek — где накапливаются заметки и обзоры
+
+output_surface: file       # file | telegram | max | pachca
+
+stores:                    # относительные пути от рабочей папки человека
+  entities: entities/      # карточки организаций, людей, проектов
+  documents: documents/    # входящие документы на разбор
+  tasks: runtime/tasks.md  # задачи и обязательства
+  brief: runtime/brief.md  # утренняя сводка
+  decisions: runtime/decisions.md  # журнал решений и целей
