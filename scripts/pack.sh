@@ -33,6 +33,35 @@ for f in "$repo/SKILL.md" "$repo/README.md" "$repo"/docs/*.md "$repo"/workflows/
 done
 echo "гейт: $real_caps способностей, $real_cl направлений — документы согласованы"
 
+# Гейт каталога задач: способности задач существуют в рубрике, требуемые уровни в диапазоне.
+python3 - "$repo" <<'PY' || exit 1
+import json, re, sys
+from pathlib import Path
+repo = Path(sys.argv[1])
+rubric = (repo / "rubric" / "aist-pos-rubric.yaml").read_text(encoding="utf-8")
+caps = set(re.findall(r"^  - id: (\w+)$", rubric, flags=re.M))
+data = json.loads((repo / "rubric" / "job-sets.json").read_text(encoding="utf-8"))
+groups = {g["id"] for g in data["groups"]}
+bad = []
+for j in data["jobs"]:
+    if j["group"] not in groups:
+        bad.append("%s: неизвестная группа %s" % (j["id"], j["group"]))
+    if not j.get("needs"):
+        bad.append("%s: не указано, что нужно" % j["id"])
+    for cap, lvl in j.get("needs", {}).items():
+        if cap not in caps:
+            bad.append("%s: способности %s нет в рубрике" % (j["id"], cap))
+        if not isinstance(lvl, int) or not 1 <= lvl <= 5:
+            bad.append("%s: у %s уровень %r вне диапазона 1–5" % (j["id"], cap, lvl))
+if bad:
+    print("СБОРКА ОСТАНОВЛЕНА: каталог задач разошёлся с рубрикой")
+    for b in bad:
+        print("  ·", b)
+    sys.exit(1)
+print("гейт: %d задач, %d требуемых уровней — сходятся с рубрикой"
+      % (len(data["jobs"]), sum(len(j["needs"]) for j in data["jobs"])))
+PY
+
 mkdir -p "$dist" "$stage/$name"
 
 # В архив идёт только содержимое навыка: ни .git, ни личных данных, ни артефактов сборки.

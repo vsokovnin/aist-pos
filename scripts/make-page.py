@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Собирает plan.html из шаблона и профиля человека.
+"""Собирает plan.html из шаблона, профиля человека и каталога задач.
 
     python3 scripts/make-page.py profile.json plan.html
 
-profile.json — только персональная часть (уровни, шаги, находки осмотра).
-Лестницы уровней уже внутри шаблона: их писать не нужно.
+profile.json — только персональная часть (уровни, шаги, находки осмотра, выбранная задача).
+Лестницы уровней уже внутри шаблона, каталог задач — в rubric/job-sets.json.
 """
 import json
 import re
@@ -16,23 +16,61 @@ CAPS = ["memory", "context_seed", "naming", "root_file", "git", "source_map",
         "output_form", "research", "decision_log", "handover", "autonomy",
         "sign_off"]
 REQUIRED = ["meta", "stageWas", "stageNow", "directions", "weakNote", "capabilities",
-            "moved", "pinned", "mainStep", "nextSteps", "inspection", "signals",
+            "moved", "chosen", "mainStep", "nextSteps", "inspection", "signals",
             "reassess", "journal"]
-SETS = ["day", "meet", "promises", "draft", "followup", "board", "report",
-        "quarter", "market", "dossier", "deck", "assistant"]
+ROOT = Path(__file__).resolve().parent.parent
 
 
 def fail(msg):
     sys.exit("ОШИБКА: " + msg)
 
 
+def load_jobs(icons):
+    """Каталог задач: группы, задачи, требуемый уровень по каждой способности."""
+    path = ROOT / "rubric" / "job-sets.json"
+    if not path.exists():
+        fail("не найден каталог задач " + str(path))
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        fail("каталог задач — невалидный JSON: " + str(e))
+    groups = {g["id"] for g in data.get("groups", [])}
+    if not groups:
+        fail("в каталоге задач нет ни одной группы")
+    if not data.get("jobs"):
+        fail("в каталоге задач нет ни одной задачи")
+    for j in data["jobs"]:
+        for key in ("id", "group", "icon", "title", "short", "promise"):
+            if not j.get(key):
+                fail("у задачи %s нет поля %s" % (j.get("id", "?"), key))
+        if j["group"] not in groups:
+            fail("задача %s ссылается на неизвестную группу %s" % (j["id"], j["group"]))
+        if j["icon"] not in icons:
+            fail("у задачи %s значок %s, которого нет в шаблоне" % (j["id"], j["icon"]))
+        needs = j.get("needs")
+        if not needs:
+            fail("у задачи %s не указано, какие способности и до какого уровня нужны" % j["id"])
+        for cap, lvl in needs.items():
+            if cap not in CAPS:
+                fail("задача %s требует неизвестной способности %s" % (j["id"], cap))
+            if not isinstance(lvl, int) or not 1 <= lvl <= 5:
+                fail("в задаче %s у способности %s требуемый уровень должен быть числом от 1 до 5"
+                     % (j["id"], cap))
+    return data
+
+
 def main():
     if len(sys.argv) != 3:
         fail("нужно два аргумента: profile.json и путь к plan.html")
     profile_path, out_path = Path(sys.argv[1]), Path(sys.argv[2])
-    template = Path(__file__).resolve().parent.parent / "assets" / "plan-template.html"
+    template = ROOT / "assets" / "plan-template.html"
     if not template.exists():
         fail("не найден шаблон " + str(template))
+    html = template.read_text(encoding="utf-8")
+
+    icons = set(re.findall(r"^  (\w+):'", html, flags=re.M))
+    jobs = load_jobs(icons)
+    job_ids = [j["id"] for j in jobs["jobs"]]
 
     try:
         data = json.loads(profile_path.read_text(encoding="utf-8"))
@@ -54,29 +92,34 @@ def main():
         if "ladder" in c:
             fail("лестницы уже в шаблоне — уберите поле ladder у %s" % c["id"])
 
-    unknown = [p for p in data["pinned"] if p not in SETS]
-    if unknown:
-        fail("в pinned неизвестные наборы: " + ", ".join(unknown))
+    if data["chosen"] not in job_ids:
+        fail("выбранная задача %s не из каталога: %s" % (data["chosen"], ", ".join(job_ids)))
     for st in data["nextSteps"]:
         if st.get("cap") not in CAPS:
             fail("шаг %s ссылается на неизвестную способность %s" % (st.get("id"), st.get("cap")))
         if not any(c["id"] == st["cap"] and c["levelNow"] < 3 for c in caps):
             fail("шаг %s висит на способности, которая уже закрыта или отсутствует" % st.get("id"))
 
-    skill_md = Path(__file__).resolve().parent.parent / "SKILL.md"
     version = "неизвестна"
+    skill_md = ROOT / "SKILL.md"
     if skill_md.exists():
         for line in skill_md.read_text(encoding="utf-8").splitlines():
             if line.startswith("version:"):
                 version = line.split(":", 1)[1].strip()
                 break
 
-    html = template.read_text(encoding="utf-8")
     block = "/* DATA */\nconst DATA = %s;\n/* конец DATA */" % json.dumps(
         data, ensure_ascii=False, indent=2)
     out, n = re.subn(r"/\* DATA \*/.*?/\* конец DATA \*/", lambda m: block, html, flags=re.S)
     if n != 1:
         fail("в шаблоне не найдены маркеры DATA")
+
+    jblock = ("/* JOBS */\nconst JOB_GROUPS = %s;\nconst JOBS = %s;\n/* конец JOBS */"
+              % (json.dumps(jobs["groups"], ensure_ascii=False, indent=2),
+                 json.dumps(jobs["jobs"], ensure_ascii=False, indent=2)))
+    out, n = re.subn(r"/\* JOBS \*/.*?/\* конец JOBS \*/", lambda m: jblock, out, flags=re.S)
+    if n != 1:
+        fail("в шаблоне не найдены маркеры JOBS")
 
     if "undefined" in out:
         fail("в собранной странице осталось undefined")
@@ -87,12 +130,19 @@ def main():
     out = out.replace("<head>", "<head>\n<!-- собрано навыком AIST POS %s -->" % version, 1)
     out = out.replace('const SKILL_VERSION = "dev";', 'const SKILL_VERSION = "%s";' % version, 1)
     out_path.write_text(out, encoding="utf-8")
+
+    level = {c["id"]: c["levelNow"] for c in caps}
+    ready = sum(1 for j in jobs["jobs"]
+                if all(level[c] >= n for c, n in j["needs"].items()))
+    chosen = next(j for j in jobs["jobs"] if j["id"] == data["chosen"])
     repeat = any(c["level"] != c["levelNow"] for c in caps)
+    grown = sum(1 for c in caps if c["levelNow"] > c["level"])
     print("страница:", out_path.resolve())
     print("версия:  %s" % version)
     print("стадия:  %s (%s)" % (data["stageNow"]["n"], data["stageNow"]["name"]))
-    print("шагов:   %s · наборов рекомендовано: %s" % (len(data["nextSteps"]), len(data["pinned"])))
-    print("серий на радаре:", 2 if repeat else 1)
+    print("задач:   %d · готово: %d · выбрана: %s" % (len(job_ids), ready, chosen["title"]))
+    print("шагов:   %s" % len(data["nextSteps"]))
+    print("оценка:  %s" % ("повторная, выросло способностей: %d" % grown if repeat else "первая"))
 
 
 if __name__ == "__main__":

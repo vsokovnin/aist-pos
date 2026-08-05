@@ -274,6 +274,85 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
   section{break-inside:avoid;page-break-inside:avoid}
   .cap{break-inside:avoid}
 }
+
+/* задачи: доска, разбор, матрица */
+.gsec{margin-bottom:26px}
+.gsec:last-child{margin-bottom:0}
+.ghead{display:flex;align-items:baseline;gap:12px;border-bottom:1px solid var(--border);
+  padding-bottom:8px;margin-bottom:14px}
+.ghead h3{font-family:var(--font-display);font-size:15px;font-weight:600}
+.ghead span{font-size:13px;color:var(--subtle)}
+.jgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.jcard{display:block;width:100%;text-align:left;border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:14px 16px 13px;background:var(--card);cursor:pointer;
+  font:inherit;color:inherit;transition:border-color 160ms var(--ease),background 160ms var(--ease)}
+.jcard:hover{border-color:var(--rule)}
+.jcard.near{border-color:var(--primary);background:var(--primary-soft)}
+.jcard.cur{border-color:var(--primary);box-shadow:inset 0 0 0 1px var(--primary)}
+.jcard.done{background:var(--success-soft);border-color:transparent}
+.jhead{display:flex;align-items:flex-start;gap:10px}
+.jhead b{font-family:var(--font-display);font-size:15px;line-height:1.3;flex:1}
+.jcard .ico{width:26px;height:26px;border-radius:7px;background:var(--secondary);
+  color:var(--primary);display:grid;place-items:center;flex:none}
+.jcard .ico svg{width:16px;height:16px}
+.jcard.near .ico{background:#fff}
+.flag{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--primary);flex:none;padding-top:3px}
+.jcard.done .flag{color:var(--success-deep)}
+.jshort{display:block;color:var(--muted-foreground);font-size:13.5px;line-height:1.45;margin:6px 0 10px}
+.ready{display:flex;align-items:center;gap:10px}
+.rbar{flex:1;height:8px;border-radius:4px;background:var(--secondary);position:relative;max-width:180px}
+.ready.wide .rbar{max-width:320px}
+.rbar i{position:absolute;left:0;top:0;height:8px;border-radius:4px;background:var(--primary)}
+.rnum{font-family:var(--font-mono);font-size:12px;color:var(--muted-foreground)}
+.miss{display:block;font-size:12.5px;color:var(--subtle);margin-top:8px;line-height:1.4}
+.jsel{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card);
+  padding:22px 24px 18px}
+.jsel .label{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--subtle)}
+.jsel h3{font-family:var(--font-display);font-size:21px;font-weight:600;margin:2px 0 6px}
+.jpromise{color:var(--muted-foreground);margin:0 0 14px;max-width:760px}
+.jtable{width:100%;border-collapse:collapse;margin-top:14px}
+.jtable td{padding:10px 8px;border-bottom:1px solid var(--border);font-size:14.5px;vertical-align:middle}
+.jtable td.cap{width:36%}
+.jtable td.sc{width:86px}
+.jtable td.need,.jtable td.you{font-family:var(--font-mono);font-size:12.5px;
+  color:var(--muted-foreground);width:92px}
+.jtable td.step{font-size:13.5px;color:var(--muted-foreground)}
+.jtable tr.gap td.step{color:#8a5a00;background:rgba(234,179,8,.12);border-radius:6px}
+.dots{display:inline-flex;gap:5px}
+.dots .d{width:9px;height:9px;border-radius:50%;background:var(--secondary);
+  box-shadow:inset 0 0 0 1px var(--border)}
+.dots .d.on{background:var(--primary);box-shadow:none}
+.dots .d.want{background:var(--card);box-shadow:inset 0 0 0 1.5px var(--primary)}
+.strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.strip .chip{font-size:12.5px;color:var(--muted-foreground);border:1px solid var(--border);
+  border-radius:999px;padding:4px 11px;background:var(--card);cursor:pointer;font-family:inherit}
+.strip .chip b{font-family:var(--font-mono);font-size:11.5px;color:var(--foreground)}
+.strip .chip.cur{border-color:var(--primary);background:var(--primary-soft);color:var(--primary-deep)}
+.mwrap{overflow-x:auto}
+.matrix{border-collapse:collapse;font-size:12.5px;width:100%}
+.matrix th.corner{text-align:left;font:400 11px/1.3 var(--font-mono);color:var(--subtle);
+  padding:0 8px 8px 0}
+.matrix thead th{vertical-align:bottom;padding:0 2px 8px;width:52px}
+.matrix thead th span{writing-mode:vertical-rl;transform:rotate(180deg);
+  font:400 11.5px/1.2 var(--font-body);color:var(--muted-foreground);white-space:nowrap}
+.matrix th.rh{text-align:left;font:400 13.5px/1.35 var(--font-body);padding:5px 10px 5px 0;
+  border-top:1px solid var(--border);white-space:nowrap}
+.matrix th.rh .lv{font-family:var(--font-mono);font-size:11.5px;color:var(--subtle);margin-left:4px}
+.matrix td{text-align:center;border-top:1px solid var(--border);font-family:var(--font-mono);
+  font-size:12px;padding:5px 2px}
+.matrix td.met{background:var(--primary-soft);color:var(--primary-deep)}
+.matrix td.unmet{background:rgba(234,179,8,.14);color:#8a5a00}
+.matrix td.empty{color:transparent}
+.mlegend{font-size:12.5px;color:var(--muted-foreground);margin:12px 0 0;
+  display:flex;align-items:center;gap:6px}
+.mlegend .sw{width:13px;height:13px;border-radius:3px;display:inline-block;margin-left:12px}
+.mlegend .sw:first-child{margin-left:0}
+.sw.met{background:var(--primary-soft);box-shadow:inset 0 0 0 1px rgba(0,72,178,.3)}
+.sw.unmet{background:rgba(234,179,8,.14);box-shadow:inset 0 0 0 1px rgba(234,179,8,.5)}
+.sw.empty{background:var(--card);box-shadow:inset 0 0 0 1px var(--border)}
+@media(max-width:900px){.jgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -300,30 +379,15 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
   <div class="mainstep" id="mainStep"></div>
 </section>
 
-<section id="diagnoz">
-  <div class="sechead"><h2>Профиль: где сильно, где проседает</h2></div>
-  <div class="diag">
-    <div>
-      <div class="radar-legend" id="radarLegend"></div>
-      <div id="radarBox"></div>
-    </div>
-    <div>
-      <div class="callout" id="weakBox"></div>
-      <div id="dirList"></div>
-    </div>
-  </div>
+<section id="zadachi">
+  <div class="sechead"><h2>Задачи: с чего начать</h2></div>
+  <p class="lead">Выбирайте не способность, а задачу. Под каждой видно, сколько из нужного у вас уже есть и чего не хватает. Нажмите на карточку — ниже появится разбор именно этой задачи.</p>
+  <div id="jobBoard"></div>
 </section>
 
-<section id="sets">
-  <div class="sechead"><h2>Что вы хотите закрыть первым</h2></div>
-  <p class="lead">Набор — не список файлов, которые надо завести, а задача, которая после него делается сама. Шаг, сделанный в одном наборе, засчитывается в остальных.</p>
-  <h3 class="subhead" id="recHead">Рекомендуем вам</h3>
-  <div class="grid" id="gridRec"></div>
-</section>
-
-<section id="library">
-  <div class="sechead"><h2>Библиотека наборов</h2></div>
-  <div class="grid" id="gridAll"></div>
+<section id="vybor">
+  <div class="sechead"><h2>Выбранная задача</h2></div>
+  <div id="jobDetail"></div>
 </section>
 
 <section id="uvidel">
@@ -333,6 +397,13 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
     <thead><tr><th>Что проверял</th><th>Найдено</th><th>Итог</th><th>Откуда</th></tr></thead>
     <tbody id="inspBody"></tbody>
   </table></div>
+</section>
+
+<section id="kapot">
+  <div class="sechead"><h2>Что под капотом</h2></div>
+  <p class="lead">Здесь видно, из чего собирается каждая задача: какая способность в ней нужна и до какого уровня. Слева — ваш уровень. Это ответ на вопрос «почему система так считает».</p>
+  <div class="callout" id="weakBox"></div>
+  <div id="matrixBox"></div>
 </section>
 
 <section id="rost">
@@ -371,21 +442,6 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
 <footer id="foot"></footer>
 </div>
 
-<dialog id="dlg">
-  <div class="mhead"><span class="ico" id="mIco"></span><h3 id="mTitle"></h3></div>
-  <div class="mbody">
-    <h4>Что изменится</h4>
-    <p id="mPromise"></p>
-    <h4>Из чего собирается</h4>
-    <div class="chips" id="mChips"></div>
-    <h4 id="mStepsHead">Осталось сделать</h4>
-    <ul class="msteps" id="mSteps"></ul>
-  </div>
-  <div class="mfoot">
-    <button class="ghost" id="mClose">Закрыть</button>
-    <span class="note" id="mNote"></span>
-  </div>
-</dialog>
 
 <div style="display:none">
 </div>
@@ -478,8 +534,8 @@ const LADDERS = {
   autonomy: ["Веду за руку: спросил — ответил, следующий шаг подсказываю сам",
     "Иногда проходит два-три шага подряд, но где остановится — не угадать, приходится подталкивать",
     "Ставлю задачу — получаю готовый результат: агент сам проходит цепочку до конца и приносит файл или письмо, а не совет, как это сделать",
-    "Вижу, на каком шаге цепочка обрывается или уходит не туда, и правлю: что отдать целиком, а где поставить проверку",
-    "Часть работы идёт без моей просьбы: повторяющееся запускается по расписанию или по событию, а мне приходит готовое"],
+    "Повторяющееся идёт без моей просьбы — по расписанию или по событию, — а я вижу, где цепочка обрывается, и правлю: что отдать целиком, где поставить проверку",
+    "Маршруты подстраиваются сами: что повторяется — уходит в расписание, что перестало быть нужным — отмирает"],
   sign_off: ["Такой границы нет: важное делаю сам, а что доверить агенту — решаю каждый раз на ходу",
     "Примерно понимаю, что доверяю, а что нет, но нигде это не записано — и в похожих случаях выходит по-разному",
     "Записано, что агент делает и отправляет сам, а что уходит только с моей визой, — и он сам останавливается на этой черте и приносит на подпись",
@@ -518,56 +574,10 @@ const CAP_TITLES = {
   autonomy:"Самостоятельность агента", sign_off:"Граница ответственности"
 };
 
-const SETS = [
-  { id:"day", icon:"digest", title:"День начинается с одной сводки",
-    short:"Утром одна сводка вместо обхода почты, календаря и мессенджеров.",
-    promise:"Вы открываете одну страницу и видите: какие сегодня встречи, какие письма ждут ответа и что висит на вас с прошлой недели. Не открываете пять вкладок и ничего не выискиваете.",
-    caps:["connectors","capture","playbook"] },
-  { id:"meet", icon:"people", title:"К встрече готов за пять минут",
-    short:"Кто эти люди, что между вами было и о чём говорить — до того, как вы вошли.",
-    promise:"За пять минут до разговора вы знаете, кто эти люди и из какой они компании, что между вами было в прошлый раз, что висит с той встречи и о чём имеет смысл говорить сегодня.",
-    caps:["connectors","capture","graph","playbook"] },
-  { id:"promises", icon:"check", title:"Ничего не забыто",
-    short:"Что обещали вы и что обещали вам — не держится в голове.",
-    promise:"Обязательства из писем и встреч сами оказываются в списке: отдельно ваши, отдельно те, что ждёте вы. Просроченное сверху. Ничего не всплывает через неделю в неудобный момент.",
-    caps:["connectors","capture","graph"] },
-  { id:"draft", icon:"pen", title:"Черновик ответа готов к отправке",
-    short:"Письмо, согласование или отказ приходят готовыми к правке.",
-    promise:"Вы говорите «ответь по договору» — и получаете черновик в вашем тоне, с учётом прошлой переписки и того, что вы уже обещали. Остаётся прочитать и отправить.",
-    caps:["graph","memory","context_seed","playbook","output_form","sign_off"] },
-  { id:"followup", icon:"handout", title:"После встречи итоги уже разосланы",
-    short:"Решения и поручения оформлены, пока все помнят разговор.",
-    promise:"Через десять минут после встречи готовы итоги: что решили, кто что делает и к какому сроку — в том виде, в котором это можно сразу отправить участникам.",
-    caps:["capture","graph","output_form","sign_off"] },
-  { id:"board", icon:"board", title:"К совету: повестка, материалы, вопросы",
-    short:"Материалы разобраны, повестка собрана, вопросы сформулированы.",
-    promise:"Материалы к заседанию разобраны за вас: что изменилось с прошлого раза, где цифры расходятся, какие вопросы стоит задать менеджменту и по каким пунктам вы обещали вернуться.",
-    caps:["doc_source","playbook","graph","quality","sign_off"] },
-  { id:"report", icon:"doc", title:"Отчёт за двадцать минут, а не за вечер",
-    short:"Восемьдесят страниц превращаются в разбор со ссылками на страницы.",
-    promise:"Пришёл финансовый отчёт или пакет материалов — вместо вечера чтения вы получаете разбор: главное, что настораживает, и где именно это написано. Каждая цифра проверяема.",
-    caps:["doc_source","quality","playbook"] },
-  { id:"quarter", icon:"quarter", title:"Квартал закрыт: цели, факт, выводы",
-    short:"Период подведён числами, решения зафиксированы.",
-    promise:"В конце периода видно, что планировали и что вышло, какие решения принимали и почему. Через квартал вы открываете журнал и понимаете логику прошлого себя.",
-    caps:["playbook","memory","decision_log","output_form"] },
-  { id:"market", icon:"chart", title:"Обзор рынка с проверяемыми источниками",
-    short:"Картина по рынку и конкурентам, где у каждого утверждения виден источник.",
-    promise:"Вы получаете обзор по рынку или конкуренту, в котором каждое утверждение подкреплено ссылкой, а не выдумано. Следующий обзор строится поверх предыдущего.",
-    caps:["research","quality","playbook"] },
-  { id:"dossier", icon:"dossier", title:"Досье за десять минут",
-    short:"Кто эта компания или человек — до того, как вы сели за стол.",
-    promise:"Перед первой встречей или сделкой у вас на руках: чем занимается компания, кто принимает решения, что о них известно публично и на что обратить внимание.",
-    caps:["research","graph","quality"] },
-  { id:"deck", icon:"slides", title:"Из заметок в готовые слайды",
-    short:"Путь от идей до выступления без ручной пересборки формата.",
-    promise:"Ваши заметки и материалы собираются в структуру выступления и дальше в слайды. Вы правите содержание, а не переносите текст из формата в формат.",
-    caps:["playbook","memory","output_form"] },
-  { id:"assistant", icon:"keys", title:"Ассистент работает в вашей системе",
-    short:"Другой человек входит в систему и не ломает её, не видя лишнего.",
-    promise:"Ассистент или секретарь работает по вашим правилам: знает, куда что класть и где искать, и при этом не видит того, что видеть не должен.",
-    caps:["root_file","source_map","naming","handover","sign_off"] }
-];
+/* JOBS */
+const JOB_GROUPS = [];
+const JOBS = [];
+/* конец JOBS */
 
 /* DATA */
 const DATA = {
@@ -946,10 +956,17 @@ const avg = (id, key) => {
   return caps.reduce((s,c) => s + c[key], 0) / caps.length;
 };
 const capLevel = id => (capById(id) || { levelNow: 0 }).levelNow;
-const setCapsOpen = s => s.caps.filter(c => capLevel(c) < 3);
-const setStepsOpen = s => setCapsOpen(s)
-  .map(c => DATA.nextSteps.find(x => x.cap === c))
-  .filter(Boolean);
+const capTitle = id => (capById(id) || {}).title || CAP_TITLES[id] || id;
+const capShort = id => (capById(id) || {}).short || capTitle(id);
+const jobById = id => JOBS.find(j => j.id === id);
+const jobEntries = j => Object.keys(j.needs).map(c => [c, j.needs[c]]);
+const jobGaps = j => jobEntries(j).filter(e => capLevel(e[0]) < e[1]);
+const jobDone = j => jobEntries(j).filter(e => capLevel(e[0]) >= e[1]).length;
+/* ниже третьего уровня основа заводится одним шагом; четвёртый и пятый берутся по одной ступени */
+const rungs = (lvl, need) => lvl >= need ? 0 : (lvl < 3 ? 1 + Math.max(0, need - 3) : need - lvl);
+const nextTarget = lvl => lvl < 3 ? 3 : lvl + 1;
+const jobSteps = j => jobEntries(j).reduce((s, e) => s + rungs(capLevel(e[0]), e[1]), 0);
+const HORIZON = { 3: "на этой неделе", 4: "в течение месяца", 5: "за квартал" };
 
 /* header */
 $("#hTitle").textContent = "Зрелость вашей личной ОС";
@@ -977,8 +994,8 @@ $("#tiles").innerHTML = [
         (DATA.stageNow.score - DATA.stageWas.score).toFixed(1) + "</b>" : DATA.stageNow.desc },
   { v: String(belowNow), l: "Способностей ниже базовой",
     n: isRepeat ? "было " + belowWas : "из " + DATA.capabilities.length },
-  { v: String(SETS.filter(s => setCapsOpen(s).length).length), l: "Наборов открыто",
-    n: "из " + SETS.length }
+  { v: String(JOBS.filter(j => !jobGaps(j).length).length), l: "Задач готово",
+    n: "из " + JOBS.length }
 ].map(t => '<div class="tile"><div class="v">' + t.v + '</div><div class="l">' + esc(t.l) +
   '</div><div class="n">' + t.n + "</div></div>").join("");
 
@@ -990,68 +1007,101 @@ else $("#movedBox").innerHTML = '<div class="k">Что сдвинулось</div
 $("#mainStep").innerHTML = '<div class="k">' + esc(DATA.mainStep.kicker) + "</div><h3>" +
   esc(DATA.mainStep.title) + "</h3><p>" + esc(DATA.mainStep.why) + "</p>";
 
-/* radar */
-(function radar(){
-  const caps = DATA.capabilities, n = caps.length;
-  const cx = 230, cy = 232, R = 138, LR = R + 34;
-  const ang = i => (-Math.PI/2) + (2*Math.PI*i/n);
-  const pt = (i, r) => [cx + r*Math.cos(ang(i)), cy + r*Math.sin(ang(i))];
-  const poly = vals => vals.map((v,i) => pt(i, R*v/5).map(x => x.toFixed(1)).join(",")).join(" ");
-  let s = '<svg class="radar" viewBox="0 0 460 470" role="img" aria-label="Профиль по способностям">';
-  for (let ring = 1; ring <= 5; ring++)
-    s += '<polygon points="' + caps.map((_,i) => pt(i, R*ring/5).map(x => x.toFixed(1)).join(",")).join(" ") +
-         '" fill="none" stroke="#E0E0E0" stroke-width="1"/>';
-  caps.forEach((_,i) => {
-    const [x,y] = pt(i, R);
-    s += '<line x1="' + cx + '" y1="' + cy + '" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) +
-         '" stroke="#E0E0E0" stroke-width="1"/>';
-  });
-  if (isRepeat)
-    s += '<polygon points="' + poly(caps.map(c => c.levelNow)) +
-         '" fill="rgba(22,163,74,.10)" stroke="#16A34A" stroke-width="2"/>';
-  s += '<polygon points="' + poly(caps.map(c => c.level)) +
-       '" fill="rgba(0,72,178,.10)" stroke="#0048B2" stroke-width="2"/>';
-  caps.forEach((c,i) => {
-    const [x,y] = pt(i, R*c.level/5);
-    s += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3.5" fill="#0048B2"><title>' +
-         esc(c.title) + ": " + (c.levelNow !== c.level ? c.level + " → " + c.levelNow : c.level) +
-         "</title></circle>";
-  });
-  caps.forEach((c,i) => {
-    const [x,y] = pt(i, LR);
-    const cos = Math.cos(ang(i));
-    const anchor = cos > 0.25 ? "start" : cos < -0.25 ? "end" : "middle";
-    s += '<text x="' + x.toFixed(1) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="' + anchor +
-         '" font-size="11.5" fill="#595959" font-family="Inter,system-ui,sans-serif">' +
-         esc(c.short) + '<tspan fill="#8A8A8E"> ' + c.level +
-         (c.levelNow !== c.level ? "→" + c.levelNow : "") + "</tspan></text>";
-  });
-  $("#radarBox").innerHTML = s + "</svg>";
-  $("#radarLegend").innerHTML = isRepeat
-    ? '<span><i style="background:#0048B2"></i>' + esc(DATA.meta.labelWas) + "</span>" +
-      '<span><i style="background:#16A34A"></i>' + esc(DATA.meta.labelNow) + "</span>"
-    : "";
-})();
+/* доска задач, выбранная задача, матрица */
+let chosen = DATA.chosen;
 
-/* weak direction + profile */
+function jobCard(j, best){
+  const total = jobEntries(j).length, done = jobDone(j), gaps = jobGaps(j);
+  const near = gaps.length && jobSteps(j) === best;
+  const miss = gaps.length
+    ? "Не хватает: " + gaps.map(e => capShort(e[0]).toLowerCase() + " до " + e[1]).join(", ")
+    : "Всё на нужном уровне";
+  return '<button class="jcard' + (near ? " near" : "") + (gaps.length ? "" : " done") +
+    (j.id === chosen ? " cur" : "") + '" data-job="' + j.id + '">' +
+    '<span class="jhead"><span class="ico">' + icon(j.icon) + "</span><b>" + esc(j.title) + "</b>" +
+    (near ? '<span class="flag">ближе всего</span>'
+          : gaps.length ? "" : '<span class="flag">готово</span>') +
+    '</span><span class="jshort">' + esc(j.short) + "</span>" +
+    '<span class="ready"><span class="rbar"><i style="width:' + (done / total * 100) +
+    '%"></i></span><span class="rnum">' + done + " из " + total + "</span></span>" +
+    '<span class="miss">' + esc(miss) + "</span></button>";
+}
+
+function renderBoard(){
+  const open = JOBS.filter(j => jobGaps(j).length);
+  const best = open.length ? Math.min.apply(null, open.map(jobSteps)) : 0;
+  $("#jobBoard").innerHTML = JOB_GROUPS.map(g => {
+    const list = JOBS.filter(j => j.group === g.id)
+      .sort((a,b) => jobSteps(a) - jobSteps(b) || jobDone(b) - jobDone(a));
+    if (!list.length) return "";
+    return '<div class="gsec"><div class="ghead"><h3>' + esc(g.title) + "</h3><span>" +
+      esc(g.note) + '</span></div><div class="jgrid">' +
+      list.map(j => jobCard(j, best)).join("") + "</div></div>";
+  }).join("");
+}
+
+function dotsScale(lvl, need){
+  let s = '<span class="dots">';
+  for (let i = 1; i <= 5; i++)
+    s += '<i class="' + (i <= lvl ? "d on" : i <= need ? "d want" : "d") + '"></i>';
+  return s + "</span>";
+}
+
+function renderDetail(){
+  const j = jobById(chosen) || JOBS[0];
+  const total = jobEntries(j).length, done = jobDone(j), left = jobSteps(j);
+  const rows = jobEntries(j)
+    .sort((a,b) => (capLevel(a[0]) - a[1]) - (capLevel(b[0]) - b[1]))
+    .map(e => {
+      const lvl = capLevel(e[0]), need = e[1], ok = lvl >= need, tgt = nextTarget(lvl);
+      const many = rungs(lvl, need);
+      const step = ok ? "закрыто"
+        : (lvl < 3 ? "завести основу → уровень 3 · " + HORIZON[3]
+                   : "ступень " + lvl + " → " + tgt + " · " + HORIZON[tgt]) +
+          (many > 1 ? " · всего ступеней: " + many : "");
+      return '<tr class="' + (ok ? "ok" : "gap") + '"><td class="cap">' + esc(capTitle(e[0])) +
+        '</td><td class="sc">' + dotsScale(lvl, need) + '</td><td class="need">нужен ' + need +
+        '</td><td class="you">у вас ' + lvl + '</td><td class="step">' + esc(step) + "</td></tr>";
+    }).join("");
+  $("#jobDetail").innerHTML =
+    '<div class="jsel"><span class="label">Куда иду</span><h3>' + esc(j.title) + "</h3>" +
+    '<p class="jpromise">' + esc(j.promise) + "</p>" +
+    '<div class="ready wide"><span class="rbar"><i style="width:' + (done / total * 100) +
+    '%"></i></span><span class="rnum">готово ' + done + " из " + total +
+    (left ? " · ступеней до готовности: " + left : " · задача закрыта") + "</span></div>" +
+    '<table class="jtable"><tbody>' + rows + "</tbody></table>" +
+    '<div class="strip">' + JOBS.map(x => '<button class="chip' +
+      (x.id === chosen ? " cur" : "") + '" data-job="' + x.id + '">' + esc(x.title) +
+      " <b>" + jobDone(x) + "/" + jobEntries(x).length + "</b></button>").join("") +
+    "</div></div>";
+}
+
+function renderMatrix(){
+  const used = DATA.capabilities.filter(c => JOBS.some(j => j.needs[c.id]));
+  $("#matrixBox").innerHTML = '<div class="mwrap"><table class="matrix"><thead><tr>' +
+    '<th class="corner">способность · ваш уровень</th>' +
+    JOBS.map(j => "<th><span>" + esc(j.title) + "</span></th>").join("") +
+    "</tr></thead><tbody>" +
+    used.map(c => '<tr><th class="rh">' + esc(c.title) + '<span class="lv">' + c.levelNow +
+      "</span></th>" + JOBS.map(j => {
+        const need = j.needs[c.id];
+        if (!need) return '<td class="empty"></td>';
+        return '<td class="' + (c.levelNow >= need ? "met" : "unmet") + '">' + need + "</td>";
+      }).join("") + "</tr>").join("") +
+    "</tbody></table></div>" +
+    '<p class="mlegend"><i class="sw met"></i>уровень набран<i class="sw unmet"></i>нужен выше' +
+    '<i class="sw empty"></i>для этой задачи не нужна</p>';
+}
+
+renderBoard(); renderDetail(); renderMatrix();
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-job]"); if (!b) return;
+  chosen = b.dataset.job;
+  renderBoard(); renderDetail();
+  document.getElementById("vybor").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
 $("#weakBox").innerHTML = '<div class="k">Что подтянуть первым</div><p>' + esc(DATA.weakNote) + "</p>";
-$("#dirList").innerHTML = DATA.directions.map(d => {
-  const caps = DATA.capabilities.filter(c => c.dir === d.id);
-  const minNow = Math.min(...caps.map(c => c.levelNow));
-  const minWas = Math.min(...caps.map(c => c.level));
-  return '<div class="dir"><h3>' + esc(d.title) + "<em>" +
-    (isRepeat ? avg(d.id,"level").toFixed(1) + " → " : "") +
-    avg(d.id,"levelNow").toFixed(1) + "</em></h3>" +
-    caps.map(c => {
-      const w = c.level/5*100, wn = c.levelNow/5*100;
-      return '<div class="caprow"><span class="nm">' + esc(c.title) +
-        (c.levelNow === minNow ? '<span class="weak">слабое звено</span>'
-          : isRepeat && c.level === minWas ? '<span class="weak">было слабое звено</span>' : "") +
-        '</span><span class="bar"><u style="left:' + w + '%;right:' + (100-wn) + '%"></u>' +
-        '<i style="width:' + w + '%"></i></span><span class="lv">' + c.level +
-        (c.levelNow !== c.level ? "<b>→" + c.levelNow + "</b>" : "&nbsp;&nbsp;&nbsp;") + "</span></div>";
-    }).join("") + "</div>";
-}).join("");
 
 /* inspection */
 $("#inspBody").innerHTML = DATA.inspection.map(r =>
@@ -1091,53 +1141,6 @@ $(".vswitch").addEventListener("click", e => {
   renderCaps(b.dataset.view);
 });
 
-/* наборы */
-const isPinned = s => (DATA.pinned || []).includes(s.id);
-
-function setCard(s){
-  const total = s.caps.length, open = setCapsOpen(s).length, done = open === 0;
-  return '<button class="set' + (isPinned(s) ? " pinned" : "") + (done ? " done" : "") +
-    '" data-set="' + s.id + '">' +
-    (isPinned(s) ? '<span class="tag">рекомендуем</span>' : done ? '<span class="tag">работает</span>' : "") +
-    '<span class="ico">' + icon(s.icon) + "</span>" +
-    "<h4>" + esc(s.title) + "</h4><p>" + esc(s.short) + "</p>" +
-    '<div class="foot"><span class="prog">' +
-      (done ? "все шаги закрыты" : "осталось <b>" + open + "</b> из " + total) +
-    '</span><span class="pbar"><i style="width:' + ((total - open) / total * 100) + '%"></i></span>' +
-    '<span class="more">подробнее</span></div></button>';
-}
-
-const pinnedSets = SETS.filter(isPinned);
-$("#gridRec").innerHTML = pinnedSets.map(setCard).join("");
-if (!pinnedSets.length) $("#sets").hidden = true;
-$("#gridAll").innerHTML = SETS.map(setCard).join("");
-
-const dlg = $("#dlg");
-document.addEventListener("click", e => {
-  const b = e.target.closest(".set"); if (!b) return;
-  const s = SETS.find(x => x.id === b.dataset.set); if (!s) return;
-  $("#mIco").innerHTML = icon(s.icon);
-  $("#mTitle").textContent = s.title;
-  $("#mPromise").textContent = s.promise;
-  $("#mChips").innerHTML = s.caps.map(c => {
-    const cap = capById(c), ok = capLevel(c) >= 3;
-    return '<span class="chip' + (ok ? " ok" : "") + '">' +
-      esc(cap ? cap.title : (CAP_TITLES[c] || c)) + (ok ? " — есть" : "") + "</span>";
-  }).join("");
-  const open = setStepsOpen(s);
-  $("#mStepsHead").textContent = open.length ? "Осталось сделать" : "Всё сделано";
-  $("#mSteps").innerHTML = open.length
-    ? open.map((st, i) => '<li><span class="n">' + (i + 1) + "</span><span>" + esc(st.title) +
-        '</span><span class="eff">' + esc(st.effort) + "</span></li>").join("")
-    : (setCapsOpen(s).length
-        ? '<li><span class="n">—</span><span>Шаги по этому набору появятся, когда оценка охватит все его способности.</span></li>'
-        : "");
-  $("#mNote").textContent = open.length ? "шагов: " + open.length : "";
-  dlg.showModal();
-});
-$("#mClose").addEventListener("click", () => dlg.close());
-dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
-
 /* signals */
 $("#sigBody").innerHTML = DATA.signals.map(s =>
   "<tr><td>" + esc(s.cap) + "</td><td>" + esc(s.plumbing) + "</td><td>" + esc(s.usage) + "</td></tr>").join("");
@@ -1164,8 +1167,9 @@ document.addEventListener("change", e => {
 });
 
 /* nav + numbering */
-const NAV = [["svodka","Сейчас"],["diagnoz","Профиль"],["sets","Наборы"],["library","Библиотека"],
-  ["uvidel","Что видно"],["rost","Куда расти"],["signaly","Сигналы"],["reassess","Следующая оценка"],["journal","Журнал"]];
+const NAV = [["svodka","Сейчас"],["zadachi","Задачи"],["vybor","Выбранная задача"],
+  ["uvidel","Что видно"],["kapot","Под капотом"],["rost","Куда расти"],["signaly","Сигналы"],
+  ["reassess","Следующая оценка"],["journal","Журнал"]];
 $("#navLinks").innerHTML = NAV.filter(([id]) => {
   const el = document.getElementById(id); return el && !el.hidden;
 }).map(([id,l]) => '<a href="#' + id + '">' + l + "</a>").join("");
