@@ -113,6 +113,11 @@ print("гейт: инструкций %d — у каждой рекоменда�
       % sum(len(v) for v in guides.values()))
 PY
 
+# Плейбук собирается в пакет готовой страницей: человек читает его до первой оценки.
+python3 "$repo/scripts/make-playbook.py" "$repo/playbook.html" >/dev/null || {
+  echo "СБОРКА ОСТАНОВЛЕНА: не собрался плейбук"; exit 1; }
+echo "гейт: плейбук собран"
+
 mkdir -p "$dist" "$stage/$name"
 
 # В архив идёт только содержимое навыка: ни .git, ни личных данных, ни артефактов сборки.
@@ -122,6 +127,7 @@ done <<ITEMS
 SKILL.md
 README.md
 LICENSE
+playbook.html
 workflows
 rubric
 templates
