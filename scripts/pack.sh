@@ -81,6 +81,36 @@ if holes:
         print("  ·", h)
     sys.exit(1)
 print("гейт: рецепты полны — у каждой способности «что сделать · как сделать · что считать успехом»")
+
+# Гейт инструкций: у каждого рецепта есть пошаговая инструкция той же формы.
+guides = json.loads((repo / "rubric" / "guides.json").read_text(encoding="utf-8"))["guides"]
+gaps = []
+for b in re.split(r"\n  - id: ", "\n" + rubric)[1:]:
+    cap = b.split("\n", 1)[0].strip()
+    if "\n    cluster: " not in b:
+        continue
+    for key in re.findall(r"      (to_L[345]):\n        do: ", b):
+        g = guides.get(cap, {}).get(key)
+        if not g:
+            gaps.append("%s/%s: рецепт есть, пошаговой инструкции нет" % (cap, key))
+            continue
+        for field in ("title", "why", "before", "steps", "check", "pitfalls", "next"):
+            if not g.get(field):
+                gaps.append("%s/%s: в инструкции нет поля %s" % (cap, key, field))
+        for i, st in enumerate(g.get("steps", []), 1):
+            for field in ("do", "see", "fix"):
+                if not st.get(field):
+                    gaps.append("%s/%s: у шага %d нет поля %s" % (cap, key, i, field))
+        if len(g.get("steps", [])) > 7:
+            gaps.append("%s/%s: шагов %d — больше семи человек не дочитывает, режьте рекомендацию надвое"
+                        % (cap, key, len(g["steps"])))
+if gaps:
+    print("СБОРКА ОСТАНОВЛЕНА: инструкции неполные")
+    for g in gaps:
+        print("  ·", g)
+    sys.exit(1)
+print("гейт: инструкций %d — у каждой рекомендации есть пошаговая"
+      % sum(len(v) for v in guides.values()))
 PY
 
 mkdir -p "$dist" "$stage/$name"
