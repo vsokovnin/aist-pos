@@ -60,6 +60,27 @@ if bad:
     sys.exit(1)
 print("гейт: %d задач, %d требуемых уровней — сходятся с рубрикой"
       % (len(data["jobs"]), sum(len(j["needs"]) for j in data["jobs"])))
+
+# Гейт полноты рекомендаций: у каждой способности есть рецепт перехода на третий уровень
+# из трёх полей; там, где задача требует четвёртого, — ещё и рецепт перехода на четвёртый.
+need4 = {c for j in data["jobs"] for c, lvl in j["needs"].items() if lvl >= 4}
+holes = []
+for b in re.split(r"\n  - id: ", "\n" + rubric)[1:]:
+    cap = b.split("\n", 1)[0].strip()
+    if "\n    cluster: " not in b:
+        continue
+    steps = dict((m.group(1), m.group(0)) for m in re.finditer(
+        r"      (to_L[345]):\n        do: \".*?\"\n        how: \".*?\"\n        done_when: \".*?\"\n", b))
+    if "to_L3" not in steps:
+        holes.append("%s: нет рецепта на третий уровень (do, how, done_when)" % cap)
+    if cap in need4 and "to_L4" not in steps:
+        holes.append("%s: задача требует четвёртого уровня, рецепта перехода нет" % cap)
+if holes:
+    print("СБОРКА ОСТАНОВЛЕНА: рекомендации неполные")
+    for h in holes:
+        print("  ·", h)
+    sys.exit(1)
+print("гейт: рецепты полны — у каждой способности «что сделать · как сделать · что считать успехом»")
 PY
 
 mkdir -p "$dist" "$stage/$name"

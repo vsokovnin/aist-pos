@@ -353,6 +353,23 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
 .sw.unmet{background:rgba(234,179,8,.14);box-shadow:inset 0 0 0 1px rgba(234,179,8,.5)}
 .sw.empty{background:var(--card);box-shadow:inset 0 0 0 1px var(--border)}
 @media(max-width:900px){.jgrid{grid-template-columns:1fr}}
+
+.stepshead{font-family:var(--font-display);font-size:15px;font-weight:600;margin:22px 0 10px}
+.recipe{display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--border)}
+.recipe .sn{font-family:var(--font-mono);font-size:12px;color:var(--subtle);width:20px;flex:none;padding-top:3px}
+.recipe .sb{flex:1;min-width:0}
+.recipe h5{font-family:var(--font-display);font-size:15px;font-weight:600;margin:0 0 8px}
+.srow{display:flex;gap:14px;padding:5px 0;align-items:flex-start}
+.sk{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--subtle);width:150px;flex:none;padding-top:3px}
+.sv{flex:1;min-width:0}
+.sv p{margin:0;font-size:14px;color:var(--muted-foreground);line-height:1.5}
+.sv p.ask{background:var(--secondary);border-radius:var(--radius-sm);padding:10px 13px;color:var(--foreground)}
+.copy{margin-top:7px;font-size:12.5px;padding:6px 12px;border:1px solid var(--border);
+  border-radius:var(--radius-sm);background:var(--card);cursor:pointer;color:var(--primary-deep)}
+.copy:hover{border-color:var(--primary)}
+.pending{font-size:14px;color:var(--subtle)}
+.allset{margin:18px 0 0;color:var(--success-deep);font-size:14.5px}
 </style>
 </head>
 <body>
@@ -573,6 +590,10 @@ const CAP_TITLES = {
   research:"Внешний поиск с источниками", handover:"Работа не в одиночку",
   autonomy:"Самостоятельность агента", sign_off:"Граница ответственности"
 };
+
+/* RECIPES */
+const RECIPES = {};
+/* конец RECIPES */
 
 /* JOBS */
 const JOB_GROUPS = [];
@@ -1070,10 +1091,42 @@ function renderDetail(){
     '%"></i></span><span class="rnum">готово ' + done + " из " + total +
     (left ? " · ступеней до готовности: " + left : " · задача закрыта") + "</span></div>" +
     '<table class="jtable"><tbody>' + rows + "</tbody></table>" +
+    stepsBlock(j) +
     '<div class="strip">' + JOBS.map(x => '<button class="chip' +
       (x.id === chosen ? " cur" : "") + '" data-job="' + x.id + '">' + esc(x.title) +
       " <b>" + jobDone(x) + "/" + jobEntries(x).length + "</b></button>").join("") +
     "</div></div>";
+}
+
+function stepRecipe(cap, need){
+  const lvl = capLevel(cap);
+  const key = lvl < 3 ? "to_L3" : "to_L" + (lvl + 1);
+  return (RECIPES[cap] || {})[key] || null;
+}
+
+function stepsBlock(j){
+  const gaps = jobGaps(j);
+  if (!gaps.length)
+    return '<p class="allset">Для этой задачи всё на нужном уровне — делать нечего, можно пользоваться.</p>';
+  return '<h4 class="stepshead">Что сделать под эту задачу</h4>' + gaps.map((e, i) => {
+    const cap = e[0], need = e[1], lvl = capLevel(cap), r = stepRecipe(cap, need);
+    const tgt = nextTarget(lvl);
+    const hz = HORIZON[tgt] || "за квартал";
+    if (!r)
+      return '<div class="recipe"><div class="sn">' + (i + 1) + '</div><div class="sb"><h5>' +
+        esc(capTitle(cap)) + '</h5><p class="pending">Ступень ' + lvl + " → " + tgt +
+        " · " + hz + '. Порядок для этой ступени в рубрике пока не описан — спросите агента.</p></div></div>';
+    return '<div class="recipe"><div class="sn">' + (i + 1) + '</div><div class="sb">' +
+      "<h5>" + esc(r.do) + "</h5>" +
+      '<div class="srow"><span class="sk">Как сделать</span><div class="sv">' +
+        '<p class="ask">' + esc(r.how) + "</p>" +
+        '<button class="copy" data-copy="' + esc(r.how) + '">Скопировать запрос</button></div></div>' +
+      '<div class="srow"><span class="sk">Что считать успехом</span>' +
+        '<div class="sv"><p>' + esc(r.done_when) + "</p></div></div>" +
+      '<div class="srow"><span class="sk">Когда</span><div class="sv"><p>' +
+        (lvl < 3 ? "заведение основы, один заход · " : "ступень " + lvl + " → " + tgt + " · ") +
+        hz + "</p></div></div></div></div>";
+  }).join("");
 }
 
 function renderMatrix(){
@@ -1095,6 +1148,13 @@ function renderMatrix(){
 
 renderBoard(); renderDetail(); renderMatrix();
 document.addEventListener("click", e => {
+  const c = e.target.closest("[data-copy]");
+  if (c) {
+    navigator.clipboard.writeText(c.dataset.copy)
+      .then(() => toast("Запрос скопирован — вставьте его агенту"))
+      .catch(() => toast("Скопировать не вышло — выделите текст запроса вручную"));
+    return;
+  }
   const b = e.target.closest("[data-job]"); if (!b) return;
   chosen = b.dataset.job;
   renderBoard(); renderDetail();
@@ -1191,7 +1251,7 @@ function toast(msg){
 $("#exportBtn").addEventListener("click", async () => {
   const payload = JSON.stringify({
     v: 1, planVersion: DATA.meta.planVersion,
-    steps: Object.fromEntries(DATA.nextSteps.filter(s => store[s.id]).map(s => [s.id, true])),
+    steps: Object.keys(store).filter(k => store[k]),
     reassess: Object.fromEntries(DATA.reassess.filter(r => (r.id in store ? store[r.id] : r.done)).map(r => [r.id, true]))
   }, null, 2);
   try {

@@ -16,13 +16,41 @@ CAPS = ["memory", "context_seed", "naming", "root_file", "git", "source_map",
         "output_form", "research", "decision_log", "handover", "autonomy",
         "sign_off"]
 REQUIRED = ["meta", "stageWas", "stageNow", "directions", "weakNote", "capabilities",
-            "moved", "chosen", "mainStep", "nextSteps", "inspection", "signals",
+            "moved", "chosen", "mainStep", "inspection", "signals",
             "reassess", "journal"]
 ROOT = Path(__file__).resolve().parent.parent
 
 
 def fail(msg):
     sys.exit("ОШИБКА: " + msg)
+
+
+def load_recipes(need_L4):
+    """Рецепты переходов из рубрики: что сделать · как сделать · что считать успехом."""
+    text = (ROOT / "rubric" / "aist-pos-rubric.yaml").read_text(encoding="utf-8")
+    blocks = re.split(r"\n  - id: ", "\n" + text)[1:]
+    out = {}
+    for b in blocks:
+        cap = b.split("\n", 1)[0].strip()
+        # в файле есть и список направлений с такими же id — там нет поля cluster
+        if cap not in CAPS or "\n    cluster: " not in b:
+            continue
+        steps = {}
+        for m in re.finditer(
+                r"      (to_L[345]):\n        do: \"(.*?)\"\n        how: \"(.*?)\"\n"
+                r"        done_when: \"(.*?)\"\n", b):
+            steps[m.group(1)] = {"do": m.group(2), "how": m.group(3), "done_when": m.group(4)}
+        if "to_L3" not in steps:
+            fail("у способности %s нет рецепта перехода на третий уровень "
+                 "(нужны поля do, how, done_when)" % cap)
+        if cap in need_L4 and "to_L4" not in steps:
+            fail("способность %s требуется какой-то задаче на четвёртом уровне, "
+                 "но рецепта перехода на четвёртый уровень нет" % cap)
+        out[cap] = steps
+    missing = [c for c in CAPS if c not in out]
+    if missing:
+        fail("в рубрике нет рецептов для способностей: " + ", ".join(missing))
+    return out
 
 
 def load_jobs(icons):
@@ -71,6 +99,8 @@ def main():
     icons = set(re.findall(r"^  (\w+):'", html, flags=re.M))
     jobs = load_jobs(icons)
     job_ids = [j["id"] for j in jobs["jobs"]]
+    need_L4 = {c for j in jobs["jobs"] for c, lvl in j["needs"].items() if lvl >= 4}
+    recipes = load_recipes(need_L4)
 
     try:
         data = json.loads(profile_path.read_text(encoding="utf-8"))
@@ -94,11 +124,8 @@ def main():
 
     if data["chosen"] not in job_ids:
         fail("выбранная задача %s не из каталога: %s" % (data["chosen"], ", ".join(job_ids)))
-    for st in data["nextSteps"]:
-        if st.get("cap") not in CAPS:
-            fail("шаг %s ссылается на неизвестную способность %s" % (st.get("id"), st.get("cap")))
-        if not any(c["id"] == st["cap"] and c["levelNow"] < 3 for c in caps):
-            fail("шаг %s висит на способности, которая уже закрыта или отсутствует" % st.get("id"))
+    if "nextSteps" in data:
+        fail("поле nextSteps больше не нужно: шаги страница берёт из рубрики")
 
     version = "неизвестна"
     skill_md = ROOT / "SKILL.md"
@@ -113,6 +140,12 @@ def main():
     out, n = re.subn(r"/\* DATA \*/.*?/\* конец DATA \*/", lambda m: block, html, flags=re.S)
     if n != 1:
         fail("в шаблоне не найдены маркеры DATA")
+
+    rblock = ("/* RECIPES */\nconst RECIPES = %s;\n/* конец RECIPES */"
+              % json.dumps(recipes, ensure_ascii=False, indent=2))
+    out, n = re.subn(r"/\* RECIPES \*/.*?/\* конец RECIPES \*/", lambda m: rblock, out, flags=re.S)
+    if n != 1:
+        fail("в шаблоне не найдены маркеры RECIPES")
 
     jblock = ("/* JOBS */\nconst JOB_GROUPS = %s;\nconst JOBS = %s;\n/* конец JOBS */"
               % (json.dumps(jobs["groups"], ensure_ascii=False, indent=2),
@@ -141,7 +174,8 @@ def main():
     print("версия:  %s" % version)
     print("стадия:  %s (%s)" % (data["stageNow"]["n"], data["stageNow"]["name"]))
     print("задач:   %d · готово: %d · выбрана: %s" % (len(job_ids), ready, chosen["title"]))
-    print("шагов:   %s" % len(data["nextSteps"]))
+    open_rungs = sum(1 for c, n in chosen["needs"].items() if level[c] < n)
+    print("шагов:   %d открытых у выбранной задачи" % open_rungs)
     print("оценка:  %s" % ("повторная, выросло способностей: %d" % grown if repeat else "первая"))
 
 
