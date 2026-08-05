@@ -86,6 +86,37 @@ ul.minus li:before{content:"—";color:var(--subtle)}
 footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
   font-family:var(--font-mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--subtle)}
 @media(max-width:760px){.cards,.two,.scene,.sgrid{grid-template-columns:1fr}.layer{display:block}.layer b{display:block;margin-bottom:6px}}
+
+.wrap.tail{padding-top:8px}
+.zig{padding:54px 0}
+.zig.grey{background:var(--secondary)}
+.zig .inner{max-width:1040px;margin:0 auto;padding:0 24px;display:grid;
+  grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+.zig.rev .ztext{order:2}
+.kick{font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--subtle);margin-bottom:10px}
+.kick.blue{color:var(--primary)}
+.ztext h2{font-family:var(--font-display);font-size:31px;line-height:1.16;font-weight:600;margin:0 0 14px}
+.ztext p{margin:0 0 12px;color:var(--muted-foreground);font-size:17px}
+.ztext .after{font-size:15.5px;color:var(--subtle)}
+.ztiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-self:start}
+.zt{background:var(--secondary);border-radius:var(--radius-md);padding:15px 17px}
+.zig.grey .zt{background:var(--card)}
+.zt b{font-family:var(--font-display);font-size:15.5px;display:block;margin-bottom:5px;line-height:1.3}
+.zt span{color:var(--subtle);font-size:13.5px;line-height:1.45;display:block}
+.zart .cards{grid-template-columns:1fr 1fr}
+.zart .card{padding:16px 18px}
+.zart .card p{font-size:14.5px}
+.layers{margin-top:18px;border-top:1px solid var(--border)}
+.layers .layer{padding:14px 0;gap:14px}
+.layers .layer b{width:120px;font-size:15.5px}
+.layers .layer p{font-size:15px}
+.two{grid-template-columns:repeat(3,1fr)}
+.privacy{margin-top:14px}
+.privacy b{font-family:var(--font-display);font-size:17px;display:block;margin-bottom:6px}
+.privacy p{margin:0}
+.start{margin-top:52px}
+@media(max-width:900px){.zig .inner,.ztiles,.two{grid-template-columns:1fr}.zig.rev .ztext{order:0}}
 </style>
 </head>
 <body>
@@ -93,17 +124,28 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
   <div class="kicker">AIST POS · с чего всё начинается</div>
   <h1 id="title"></h1>
   <p class="lead" id="lead"></p>
+</div>
 
-  <div class="scene">
-    <div>
-      <div class="clabel" id="chaosLabel"></div>
-      <div class="chaosbox">
-        <p class="big" id="chaosTitle"></p>
-        <p class="q" id="chaosQuestion"></p>
-        <ul id="pains"></ul>
-      </div>
+<div class="zig">
+  <div class="inner">
+    <div class="ztext">
+      <div class="kick" id="problemKick"></div>
+      <h2 id="problemTitle"></h2>
+      <p id="problemText"></p>
     </div>
-    <div>
+    <div class="ztiles" id="pains"></div>
+  </div>
+</div>
+
+<div class="zig grey rev">
+  <div class="inner">
+    <div class="ztext">
+      <div class="kick blue" id="visionKick"></div>
+      <h2 id="visionTitle"></h2>
+      <p id="visionText"></p>
+      <p class="after" id="after"></p>
+    </div>
+    <div class="zart">
       <div class="clabel blue" id="digestLabel"></div>
       <div class="digest">
         <div class="dhead" id="digestTitle"></div>
@@ -112,22 +154,33 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
       </div>
     </div>
   </div>
-  <p class="after" id="after"></p>
+</div>
 
-  <h2 id="goalTitle"></h2>
-  <p id="goalText"></p>
-
-  <h2 id="tasksTitle"></h2>
-  <div class="cards" id="tasks"></div>
-
-  <h2 id="howTitle"></h2>
-  <p id="howText"></p>
-  <div id="layers"></div>
-
+<div class="wrap tail">
   <h2 id="storiesTitle"></h2>
   <div id="stories"></div>
+</div>
 
+<div class="zig grey">
+  <div class="inner">
+    <div class="ztext">
+      <div class="kick blue" id="pathKick"></div>
+      <h2 id="pathTitle"></h2>
+      <p id="pathText"></p>
+      <div class="layers" id="layers"></div>
+    </div>
+    <div class="zart">
+      <div class="cards" id="tasks"></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap tail">
   <div class="two">
+    <div class="panel need">
+      <h2 id="needTitle"></h2>
+      <ul id="need" class="mark plus"></ul>
+    </div>
     <div class="panel yes">
       <h2 id="effectTitle"></h2>
       <ul id="effect" class="mark plus"></ul>
@@ -138,15 +191,13 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
     </div>
   </div>
 
-  <h2 id="needTitle"></h2>
-  <ul id="need"></ul>
-
-  <h2 id="privacyTitle"></h2>
-  <div class="privacy" id="privacyText"></div>
-
-  <div class="start" style="margin-top:52px">
+  <div class="start">
     <h2 id="startTitle" style="margin-top:0"></h2>
     <p id="startText"></p>
+  </div>
+  <div class="privacy">
+    <b id="privacyTitle"></b>
+    <p id="privacyText"></p>
   </div>
 
   <footer id="foot"></footer>
@@ -176,31 +227,24 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 
 $("#title").textContent = PB.title;
 $("#lead").textContent = PB.lead;
+
+$("#problemKick").textContent = PB.problem.kicker;
+$("#problemTitle").textContent = PB.problem.title;
+$("#problemText").textContent = PB.problem.text;
+$("#pains").innerHTML = PB.pains.map(p =>
+  '<div class="zt"><b>' + esc(p.pain) + "</b><span>" + esc(p.cost) + "</span></div>").join("");
+
 const H = PB.hero;
-$("#chaosLabel").textContent = H.chaosLabel;
-$("#chaosTitle").textContent = H.chaosTitle;
-$("#chaosQuestion").textContent = H.chaosQuestion;
-$("#pains").innerHTML = PB.pains.map(p => "<li>" + esc(p) + "</li>").join("");
+$("#visionKick").textContent = PB.vision.kicker;
+$("#visionTitle").textContent = PB.vision.title;
+$("#visionText").textContent = PB.vision.text;
+$("#after").textContent = H.after;
 $("#digestLabel").textContent = H.digestLabel;
 $("#digestTitle").textContent = H.digestTitle;
 $("#digestRows").innerHTML = H.digest.map(r =>
   '<div class="drow"><span class="dt">' + esc(r.when) + "</span><div><b>" + esc(r.who) +
   "</b><p>" + esc(r.what) + "</p></div></div>").join("");
 $("#digestFoot").textContent = H.digestFoot;
-$("#after").textContent = H.after;
-
-$("#goalTitle").textContent = PB.goal.title;
-$("#goalText").textContent = PB.goal.text;
-
-$("#tasksTitle").textContent = PB.tasks.title;
-$("#tasks").innerHTML = PB.tasks.items.map(t =>
-  '<div class="card"><span class="ic">' + icon(t.icon) + "</span><h3>" + esc(t.title) +
-  "</h3><p>" + esc(t.text) + "</p></div>").join("");
-
-$("#howTitle").textContent = PB.how.title;
-$("#howText").textContent = PB.how.text;
-$("#layers").innerHTML = PB.how.layers.map(l =>
-  '<div class="layer"><b>' + esc(l.n) + "</b><p>" + esc(l.text) + "</p></div>").join("");
 
 $("#storiesTitle").textContent = PB.stories.title;
 $("#stories").innerHTML = '<div class="sgrid">' + PB.stories.items.map(s =>
@@ -208,17 +252,27 @@ $("#stories").innerHTML = '<div class="sgrid">' + PB.stories.items.map(s =>
   '<div class="who">' + esc(s.who) + '</div><div class="want">' + esc(s.want) + "</div>" +
   '<p class="then">' + esc(s.then) + "</p></div>").join("") + "</div>";
 
+$("#pathKick").textContent = PB.path.kicker;
+$("#pathTitle").textContent = PB.path.title;
+$("#pathText").textContent = PB.path.text;
+$("#layers").innerHTML = PB.how.layers.map(l =>
+  '<div class="layer"><b>' + esc(l.n) + "</b><p>" + esc(l.text) + "</p></div>").join("");
+$("#tasks").innerHTML = PB.tasks.items.map(t =>
+  '<div class="card"><span class="ic">' + icon(t.icon) + "</span><h3>" + esc(t.title) +
+  "</h3><p>" + esc(t.text) + "</p></div>").join("");
+
+$("#needTitle").textContent = PB.need.title;
+$("#need").innerHTML = PB.need.items.map(i => "<li>" + esc(i) + "</li>").join("");
 $("#effectTitle").textContent = PB.effect.title;
 $("#effect").innerHTML = PB.effect.items.map(i => "<li>" + esc(i) + "</li>").join("");
 $("#notTitle").textContent = PB.not.title;
 $("#not").innerHTML = PB.not.items.map(i => "<li>" + esc(i) + "</li>").join("");
-$("#needTitle").textContent = PB.need.title;
-$("#need").innerHTML = PB.need.items.map(i => "<li>" + esc(i) + "</li>").join("");
 
-$("#privacyTitle").textContent = PB.privacy.title;
-$("#privacyText").textContent = PB.privacy.text;
 $("#startTitle").textContent = PB.start.title;
 $("#startText").textContent = PB.start.text;
+$("#privacyTitle").textContent = PB.privacy.title;
+$("#privacyText").textContent = PB.privacy.text;
+
 $("#foot").textContent = "AIST POS · навык " + SKILL_VERSION + " · плейбук";
 </script>
 </body>
