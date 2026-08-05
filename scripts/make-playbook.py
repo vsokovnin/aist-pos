@@ -12,8 +12,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FIELDS = ["title", "head", "problem", "vision", "hero", "goal", "pains", "tasks",
-          "how", "stories", "effect", "not", "need", "privacy", "start"]
+FIELDS = ["title", "head", "problem", "vision", "hero", "map", "pains", "tasks",
+          "stories", "effect", "not", "need", "privacy", "start"]
 
 
 def fail(msg):
@@ -43,6 +43,26 @@ def build(out_path):
     for c in data["head"]["cells"]:
         if not c.get("label") or not c.get("text"):
             fail("у опоры в шапке должны быть и подпись, и текст")
+    m = data["map"]
+    for f in ("title", "sub", "job", "capsLabel", "caps", "note", "foot"):
+        if not m.get(f):
+            fail("в карте модели нет поля " + f)
+    jobs_path = ROOT / "rubric" / "job-sets.json"
+    if not jobs_path.exists():
+        fail("не найден " + str(jobs_path))
+    jobs = json.loads(jobs_path.read_text(encoding="utf-8"))["jobs"]
+    job = next((j for j in jobs if j["id"] == m["job"].get("id")), None)
+    if job is None:
+        fail("в карте показана задача, которой нет в каталоге: " + str(m["job"].get("id")))
+    if m["job"]["title"] != job["title"]:
+        fail("название задачи в карте разошлось с каталогом: " + m["job"]["title"])
+    shown = {c.get("id"): c.get("need") for c in m["caps"]}
+    if shown != job["needs"]:
+        fail("в карте требуемые уровни разошлись с каталогом задач: показано %s, в каталоге %s"
+             % (shown, job["needs"]))
+    if m["capsLabel"].count("четырёх") and len(m["caps"]) != 4:
+        fail("в подписи карты сказано «из четырёх», а способностей показано " + str(len(m["caps"])))
+
     for f in ("digestLabel", "digestTitle", "digest", "digestFoot", "after"):
         if not data["hero"].get(f):
             fail("в сцене плейбука нет поля " + f)
