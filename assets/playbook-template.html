@@ -57,13 +57,9 @@ p{margin:0 0 14px}
   display:grid;place-items:center;flex:none;margin-bottom:12px}
 .ic svg{width:19px;height:19px}
 .story{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px}
-.story.big{display:flex;gap:18px;align-items:flex-start;border-color:var(--primary);
-  background:var(--primary-soft);margin-bottom:14px}
-.story.big .ic{background:var(--card);margin-bottom:0}
-.story.big .want{font-size:21px}
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.story.sm .want{font-size:17px}
-.story.sm .then{font-size:15px}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.story .want{font-size:17px}
+.story .then{font-size:15px}
 .who{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--subtle)}
 .want{font-family:var(--font-display);font-size:18px;font-weight:600;margin:6px 0 8px}
 .then{color:var(--muted-foreground);font-size:16px;margin:0}
@@ -194,17 +190,10 @@ $("#layers").innerHTML = PB.how.layers.map(l =>
   '<div class="layer"><b>' + esc(l.n) + "</b><p>" + esc(l.text) + "</p></div>").join("");
 
 $("#storiesTitle").textContent = PB.stories.title;
-const st = PB.stories.items;
-const storyBig = s =>
-  '<div class="story big"><span class="ic">' + icon(s.icon) + "</span>" +
-  '<div><div class="who">' + esc(s.who) + '</div><div class="want">' + esc(s.want) + "</div>" +
-  '<p class="then">' + esc(s.then) + "</p></div></div>";
-const storySm = s =>
-  '<div class="story sm"><span class="ic">' + icon(s.icon) + "</span>" +
+$("#stories").innerHTML = '<div class="sgrid">' + PB.stories.items.map(s =>
+  '<div class="story"><span class="ic">' + icon(s.icon) + "</span>" +
   '<div class="who">' + esc(s.who) + '</div><div class="want">' + esc(s.want) + "</div>" +
-  '<p class="then">' + esc(s.then) + "</p></div>";
-$("#stories").innerHTML = storyBig(st[0]) +
-  '<div class="sgrid">' + st.slice(1).map(storySm).join("") + "</div>";
+  '<p class="then">' + esc(s.then) + "</p></div>").join("") + "</div>";
 
 $("#effectTitle").textContent = PB.effect.title;
 $("#effect").innerHTML = PB.effect.items.map(i => "<li>" + esc(i) + "</li>").join("");
