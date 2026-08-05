@@ -12,8 +12,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FIELDS = ["title", "head", "problem", "vision", "hero", "map", "pains", "tasks",
-          "jobs", "effect", "not", "need", "privacy", "start"]
+FIELDS = ["title", "head", "problem", "vision", "hero", "map", "pains",
+          "jobs", "route", "not", "need", "privacy", "start"]
 
 
 def fail(msg):
@@ -81,6 +81,15 @@ def build(out_path):
     no_icon = sorted({j["icon"] for j in jobs} - drawn)
     if no_icon:
         fail("для задач нет знаков в шаблоне: " + ", ".join(no_icon))
+    for f in ("title", "sub", "steps", "foot"):
+        if not data["route"].get(f):
+            fail("в маршруте нет поля " + f)
+    if len(data["route"]["steps"]) != 4:
+        fail("в маршруте должно быть четыре шага: оценка, задача, первые шаги, вторая оценка")
+    for st in data["route"]["steps"]:
+        for f in ("title", "sys", "you", "out"):
+            if not st.get(f):
+                fail("у шага маршрута «%s» нет поля %s" % (st.get("title", "?"), f))
 
     version = "неизвестна"
     skill_md = ROOT / "SKILL.md"

@@ -58,10 +58,6 @@ p{margin:0 0 14px}
 .drow p{margin:4px 0 0;color:var(--muted-foreground);font-size:14.5px}
 .dfoot{padding:12px 20px;background:var(--secondary);font-size:13px;color:var(--subtle)}
 .after{margin:6px 0 0;color:var(--subtle);font-size:15.5px}
-.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px}
-.card h3{font-family:var(--font-display);font-size:17px;font-weight:600;margin:0 0 8px}
-.card p{font-size:15.5px;color:var(--muted-foreground);margin:0}
 .sub{font-size:16px;color:var(--muted-foreground);margin:-6px 0 24px}
 .abox{display:grid;grid-template-columns:300px 1fr;gap:34px;align-items:start}
 .ajob{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px}
@@ -79,10 +75,6 @@ p{margin:0 0 14px}
 .anote{margin:14px 0 0;font-size:15px;color:var(--muted-foreground)}
 .afoot{margin:24px 0 0;padding-top:14px;border-top:1px solid var(--border);
   font-size:14.5px;color:var(--subtle)}
-.card{position:relative}
-.ic{width:34px;height:34px;border-radius:9px;background:var(--primary-soft);color:var(--primary);
-  display:grid;place-items:center;flex:none;margin-bottom:12px}
-.ic svg{width:19px;height:19px}
 .jhint{display:flex;justify-content:space-between;margin:0 0 12px}
 .jhint span{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
   color:var(--subtle)}
@@ -96,6 +88,19 @@ p{margin:0 0 14px}
 ul{margin:0;padding-left:22px}
 li{margin:9px 0;color:var(--muted-foreground)}
 .two{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;align-items:stretch;margin-top:52px}
+.two.one{grid-template-columns:1fr}
+.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:4px}
+.tlc{padding-right:22px;display:flex;flex-direction:column}
+.tlc h3{font-family:var(--font-display);font-size:17px;font-weight:600;margin:0 0 12px}
+.axis{display:flex;align-items:center;height:22px;margin:2px 0 14px}
+.axis span{height:2px;background:#DCE5F3;flex:1}
+.axis i{width:11px;height:11px;border-radius:50%;background:var(--primary);flex:none}
+.tlc p{margin:0 0 10px;font-size:14.5px;color:var(--muted-foreground)}
+.tlc p b{display:block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--subtle);font-weight:400;margin-bottom:3px}
+.tlc p.you b{color:var(--primary)}
+.tlc .out{margin-top:auto;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:10px 12px;font-size:13.5px;color:var(--foreground)}
 .panel{border-radius:var(--radius-lg);padding:6px 26px 24px}
 .panel h2{margin:26px 0 14px;font-size:21px}
 .panel.yes{background:var(--primary-soft)}
@@ -115,8 +120,8 @@ ul.minus li:before{content:"—";color:var(--subtle)}
 .start p{margin:0;font-size:18px}
 footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
   font-family:var(--font-mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--subtle)}
-@media(max-width:760px){.cards,.two,.zig,.ztiles,.arow,.abox{grid-template-columns:1fr}.zig.rev .ztext{order:0}
-  .jc{flex-basis:82%}
+@media(max-width:760px){.two,.zig,.ztiles,.arow,.abox,.tl{grid-template-columns:1fr}.zig.rev .ztext{order:0}
+  .jc{flex-basis:82%}.tlc{padding:0 0 22px}
   .acap{flex-wrap:wrap;gap:10px}.acap .nm{flex:1 0 100%}.acap .lv{width:auto}
   .addr{display:block}.addr .kicker.mute{display:block;margin-top:6px}
   h1{font-size:29px}.acell{padding:16px 0 0;border-right:none;border-top:1px solid var(--border)}.acell:first-child{border-top:none;padding-top:18px}}
@@ -173,20 +178,18 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
   </div>
   <p class="afoot" id="mapFoot"></p>
 
-  <h2 id="tasksTitle"></h2>
-  <div class="cards" id="tasks"></div>
-
   <h2 id="jobsTitle"></h2>
   <p class="sub" id="jobsSub"></p>
   <div class="jhint"><span id="jobsHint"></span><span id="jobsCount"></span></div>
   <div class="strip" id="jobs"></div>
   <p class="afoot" id="jobsFoot"></p>
 
-  <div class="two">
-    <div class="panel yes">
-      <h2 id="effectTitle"></h2>
-      <ul id="effect" class="mark plus"></ul>
-    </div>
+  <h2 id="routeTitle"></h2>
+  <p class="sub" id="routeSub"></p>
+  <div class="tl" id="route"></div>
+  <p class="afoot" id="routeFoot"></p>
+
+  <div class="two one">
     <div class="panel no">
       <h2 id="notTitle"></h2>
       <ul id="not" class="mark minus"></ul>
@@ -211,19 +214,6 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
 /* PLAYBOOK */
 const PB = {};
 /* конец PLAYBOOK */
-
-const ICONS = {
-  chart:'<path d="M4 20V4"/><path d="M4 20h16"/><rect x="8" y="12" width="3" height="5"/><rect x="13" y="8" width="3" height="9"/><rect x="18" y="14" width="3" height="3"/>',
-  check:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.2l2.6 2.6 4.6-5"/>',
-  handout:'<path d="M6 4h8l4 4v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M14 4v4h4"/><path d="M9 15h6M9 12h4"/>',
-  quarter:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M9 15.5l2 2 4-4.5"/>',
-  people:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.4"/><path d="M3.5 19c.6-3 3-4.6 5.5-4.6S14 16 14.6 19M15.5 19c.3-2 1.6-3.2 3.3-3.2 1.2 0 2.2.5 2.9 1.4"/>',
-  board:'<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 12l2.5-2.5L12 12l4-4"/>',
-  keys:'<circle cx="8" cy="9" r="3"/><path d="M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/><circle cx="17.5" cy="9.5" r="2.5"/><path d="M17.5 12v6M16 15.5h3M16 18h3"/>',
-  pen:'<path d="M5 19h4l9.5-9.5a2 2 0 0 0-2.8-2.8L6 16v3z"/><path d="M14 7.5l2.5 2.5"/>',
-};
-const icon = k => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-  'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[k] || "") + "</svg>";
 
 /* знаки задач в ленте: тоньше и крупнее, чем ICONS выше — рисунок под смысл задачи */
 const JOBICONS = {
@@ -283,10 +273,15 @@ $("#mapCaps").innerHTML = M.caps.map(c =>
 $("#mapNote").textContent = M.note;
 $("#mapFoot").textContent = M.foot;
 
-$("#tasksTitle").textContent = PB.tasks.title;
-$("#tasks").innerHTML = PB.tasks.items.map(t =>
-  '<div class="card"><span class="ic">' + icon(t.icon) + "</span><h3>" + esc(t.title) +
-  "</h3><p>" + esc(t.text) + "</p></div>").join("");
+const R = PB.route;
+$("#routeTitle").textContent = R.title;
+$("#routeSub").textContent = R.sub;
+$("#route").innerHTML = R.steps.map((s, i) =>
+  '<div class="tlc"><div class="axis"><i></i>' + (i < R.steps.length - 1 ? "<span></span>" : "") +
+  "</div><h3>" + esc(s.title) + '</h3><p><b>система</b>' + esc(s.sys) +
+  '</p><p class="you"><b>вы</b>' + esc(s.you) + '</p><div class="out">' + esc(s.out) +
+  "</div></div>").join("");
+$("#routeFoot").textContent = R.foot;
 
 $("#jobsTitle").textContent = PB.jobs.title;
 $("#jobsSub").textContent = PB.jobs.sub;
@@ -297,8 +292,6 @@ $("#jobs").innerHTML = PB.jobs.items.map(j =>
   "</b><p>" + esc(j.short) + "</p></div>").join("");
 $("#jobsFoot").textContent = PB.jobs.foot;
 
-$("#effectTitle").textContent = PB.effect.title;
-$("#effect").innerHTML = PB.effect.items.map(i => "<li>" + esc(i) + "</li>").join("");
 $("#notTitle").textContent = PB.not.title;
 $("#not").innerHTML = PB.not.items.map(i => "<li>" + esc(i) + "</li>").join("");
 $("#needTitle").textContent = PB.need.title;
