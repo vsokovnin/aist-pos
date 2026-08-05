@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 FIELDS = ["title", "head", "problem", "vision", "hero", "map", "pains", "tasks",
-          "stories", "effect", "not", "need", "privacy", "start"]
+          "jobs", "effect", "not", "need", "privacy", "start"]
 
 
 def fail(msg):
@@ -71,8 +71,16 @@ def build(out_path):
     for p in data["pains"]:
         if not p.get("pain") or not p.get("cost"):
             fail("у боли должны быть и формулировка, и цена")
-    if len(data["stories"]["items"]) < 3:
-        fail("в плейбуке меньше трёх историй — по одной истории человек не поймёт, про него ли это")
+    for f in ("title", "sub", "hint", "foot"):
+        if not data["jobs"].get(f):
+            fail("в ленте задач нет поля " + f)
+    if data["jobs"].get("items"):
+        fail("задачи в плейбуке не переписываются — сборщик берёт их из каталога job-sets.json")
+    drawn = set(re.findall(r"^  (\w+):'", tpl_path.read_text(encoding="utf-8"), re.M))
+    data["jobs"]["items"] = [{"title": j["title"], "short": j["short"], "icon": j["icon"]} for j in jobs]
+    no_icon = sorted({j["icon"] for j in jobs} - drawn)
+    if no_icon:
+        fail("для задач нет знаков в шаблоне: " + ", ".join(no_icon))
 
     version = "неизвестна"
     skill_md = ROOT / "SKILL.md"
