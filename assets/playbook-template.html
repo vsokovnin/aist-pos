@@ -65,7 +65,20 @@ p{margin:0 0 14px}
 .then{color:var(--muted-foreground);font-size:16px;margin:0}
 ul{margin:0;padding-left:22px}
 li{margin:9px 0;color:var(--muted-foreground)}
-.two{display:grid;grid-template-columns:repeat(2,1fr);gap:28px}
+.two{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;align-items:stretch}
+.panel{border-radius:var(--radius-lg);padding:6px 26px 24px}
+.panel h2{margin:26px 0 14px;font-size:21px}
+.panel.yes{background:var(--primary-soft)}
+.panel.yes h2{color:var(--primary-deep)}
+.panel.no{background:var(--secondary)}
+.panel.no h2{color:var(--muted-foreground)}
+ul.mark{list-style:none;padding-left:0}
+ul.mark li{position:relative;padding-left:30px;margin:14px 0;font-size:16px}
+ul.mark li:before{position:absolute;left:0;top:0;font-family:var(--font-mono);font-size:15px}
+ul.plus li{color:var(--foreground)}
+ul.plus li:before{content:"✓";color:var(--primary);font-weight:600}
+ul.minus li{color:var(--muted-foreground)}
+ul.minus li:before{content:"—";color:var(--subtle)}
 .privacy{background:var(--primary-soft);border-radius:var(--radius-lg);padding:20px 24px;color:var(--primary-deep)}
 .start{border:1px solid var(--primary);border-radius:var(--radius-lg);padding:22px 24px;background:var(--card)}
 .start h2{margin:0 0 8px}
@@ -115,13 +128,13 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
   <div id="stories"></div>
 
   <div class="two">
-    <div>
+    <div class="panel yes">
       <h2 id="effectTitle"></h2>
-      <ul id="effect"></ul>
+      <ul id="effect" class="mark plus"></ul>
     </div>
-    <div>
+    <div class="panel no">
       <h2 id="notTitle"></h2>
-      <ul id="not"></ul>
+      <ul id="not" class="mark minus"></ul>
     </div>
   </div>
 
