@@ -1303,6 +1303,8 @@ foldRost(false);
 rostBtn.addEventListener("click", () => foldRost($("#capList").hidden));
 
 /* signals */
+/* пустая таблица с одними заголовками хуже отсутствующей секции */
+if (!DATA.signals.length) $("#signaly").hidden = true;
 $("#sigBody").innerHTML = DATA.signals.map(s =>
   "<tr><td>" + esc(s.cap) + "</td><td>" + esc(s.plumbing) + "</td><td>" + esc(s.usage) + "</td></tr>").join("");
 

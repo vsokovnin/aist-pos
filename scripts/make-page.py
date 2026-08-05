@@ -77,40 +77,6 @@ def load_guides():
     return guides
 
 
-def write_guides(guides, recipes, caps_open, out_dir, version):
-    """Собирает по странице на каждую открытую рекомендацию, для которой есть инструкция."""
-    tpl_path = ROOT / "assets" / "guide-template.html"
-    if not tpl_path.exists():
-        fail("не найден шаблон инструкции " + str(tpl_path))
-    tpl = tpl_path.read_text(encoding="utf-8")
-    written = {}
-    for cap, key in caps_open:
-        g = guides.get(cap, {}).get(key)
-        if not g:
-            continue
-        payload = dict(g)
-        payload["cap"] = cap
-        payload["transition"] = key
-        payload["kicker"] = "Шаг плана · уровень %s" % key.replace("to_L", "")
-        payload["ask"] = recipes[cap][key]["how"]
-        block = "/* GUIDE */\nconst GUIDE = %s;\n/* конец GUIDE */" % json.dumps(
-            payload, ensure_ascii=False, indent=2)
-        page, n = re.subn(r"/\* GUIDE \*/.*?/\* конец GUIDE \*/", lambda m: block, tpl, flags=re.S)
-        if n != 1:
-            fail("в шаблоне инструкции не найдены маркеры GUIDE")
-        page = page.replace("<title>Инструкция</title>",
-                            "<title>%s</title>" % g["title"], 1)
-        page = page.replace('const SKILL_VERSION = "dev";',
-                            'const SKILL_VERSION = "%s";' % version, 1)
-        if "undefined" in page:
-            fail("в инструкции %s осталось undefined" % cap)
-        out_dir.mkdir(parents=True, exist_ok=True)
-        name = "%s-%s.html" % (cap, key)
-        (out_dir / name).write_text(page, encoding="utf-8")
-        written[cap + "/" + key] = "guides/" + name
-    return written
-
-
 def load_jobs(icons):
     """Каталог задач: группы, задачи, требуемый уровень по каждой способности."""
     path = ROOT / "rubric" / "job-sets.json"
@@ -219,6 +185,20 @@ def main():
         fail("поле mainStep больше не нужно: главный шаг страница считает сама от выбранной "
              "задачи — первый её разрыв, текст из рубрики")
 
+    # Осмотр — доказательная база страницы. Один общий вердикт на всё вместо строки
+    # на направление превращает секцию в пустое обещание.
+    dirs = data.get("directions", [])
+    if len(data["inspection"]) < len(dirs):
+        fail("в осмотре %d строк, а направлений %d: нужна отдельная строка хотя бы на каждое "
+             "направление. Ничего не найдено — это тоже строка «в этой папке не вижу», "
+             "а не молчание" % (len(data["inspection"]), len(dirs)))
+    for i, row in enumerate(data["inspection"], 1):
+        if row.get("verdict") not in ("ok", "part", "no"):
+            fail("в строке осмотра %d итог должен быть ok, part или no" % i)
+        for field in ("what", "found", "src"):
+            if not str(row.get(field, "")).strip():
+                fail("в строке осмотра %d нет поля %s" % (i, field))
+
     mode = data["meta"].get("mode", "full")
     if mode not in ("full", "factual"):
         fail("meta.mode бывает только full (оценка по ответам) или factual (по факту), "
@@ -240,17 +220,20 @@ def main():
     if n != 1:
         fail("в шаблоне не найдены маркеры DATA")
 
-    caps_open = []
-    for c in caps:
-        lvl = c["levelNow"]
-        top = max((j["needs"].get(c["id"], 0) for j in jobs["jobs"]), default=0)
-        if lvl < top:
-            caps_open.append((c["id"], "to_L3" if lvl < 3 else "to_L%d" % (lvl + 1)))
-    links = write_guides(guides, recipes, caps_open, out_path.parent / "guides", version)
+    # Инструкции едут внутри страницы, а не соседней папкой: страницу скачивают и
+    # пересылают одним файлом, и ссылка на соседа в этот момент умирает.
+    inline = {}
+    for cap, byStep in guides.items():
+        for key, g in byStep.items():
+            item = dict(g)
+            item["ask"] = recipes.get(cap, {}).get(key, {}).get("how", "")
+            inline[cap + "/" + key] = item
 
-    for cap, byStep in recipes.items():
-        for key, r in byStep.items():
-            r["guide"] = links.get(cap + "/" + key, "")
+    gblock = ("/* GUIDES */\nconst GUIDES = %s;\n/* конец GUIDES */"
+              % json.dumps(inline, ensure_ascii=False, indent=2))
+    out, n = re.subn(r"/\* GUIDES \*/.*?/\* конец GUIDES \*/", lambda m: gblock, out, flags=re.S)
+    if n != 1:
+        fail("в шаблоне не найдены маркеры GUIDES")
 
     rblock = ("/* RECIPES */\nconst RECIPES = %s;\n/* конец RECIPES */"
               % json.dumps(recipes, ensure_ascii=False, indent=2))
@@ -287,7 +270,7 @@ def main():
     print("задач:   %d · готово: %d · выбрана: %s" % (len(job_ids), ready, chosen["title"]))
     open_rungs = sum(1 for c, n in chosen["needs"].items() if level[c] < n)
     print("шагов:   %d открытых у выбранной задачи" % open_rungs)
-    print("инструкций собрано: %d" % len(links))
+    print("инструкций вшито: %d" % len(inline))
     print("оценка:  %s" % ("%s, выросло способностей: %d"
                            % ("по факту" if mode == "factual" else "повторная", grown)
                            if repeat else "первая"))
