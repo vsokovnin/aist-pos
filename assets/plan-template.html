@@ -391,6 +391,24 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
 .allset{margin:18px 0 0;color:var(--success-deep);font-size:14.5px}
 .guide{display:inline-block;margin-top:12px;margin-left:164px;font-size:13.5px;
   color:var(--primary-deep);text-decoration:none;border-bottom:1px solid var(--primary-soft)}
+.guidebtn{margin:12px 0 0 164px;font-size:13px;padding:7px 14px;border:1px solid var(--border);
+  border-radius:var(--radius-sm);background:var(--card);cursor:pointer;color:var(--primary-deep)}
+.guidebtn:hover{border-color:var(--primary);background:var(--primary-soft)}
+.guidebox{margin:12px 0 0 164px;padding:16px 18px;border:1px solid var(--border);
+  border-radius:var(--radius-lg);background:var(--secondary)}
+.guidebox h6{font-family:var(--font-display);font-size:15px;font-weight:600;margin:0 0 6px}
+.guidebox .gwhy{margin:0 0 12px;color:var(--muted-foreground);font-size:14px}
+.guidebox .gk{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--subtle);display:block;margin-bottom:5px}
+.guidebox .gpart{margin:12px 0}
+.guidebox ul{margin:0;padding-left:18px;font-size:14px}
+.guidebox li{margin-bottom:5px}
+.gsteps{margin:12px 0;padding-left:20px;font-size:14px}
+.gsteps li{margin-bottom:12px}
+.gsteps b{display:block;font-weight:600;margin-bottom:4px}
+.gsteps .gsee,.gsteps .gfix{display:block;color:var(--muted-foreground);font-size:13.5px}
+.gsteps .gfix{color:var(--subtle)}
+.gnext{margin:12px 0 0;font-size:13.5px;color:var(--muted-foreground)}
 .guide:hover{border-bottom-color:var(--primary)}
 </style>
 </head>
@@ -617,6 +635,10 @@ const CAP_TITLES = {
 /* RECIPES */
 const RECIPES = {};
 /* конец RECIPES */
+
+/* GUIDES */
+const GUIDES = {};
+/* конец GUIDES */
 
 /* JOBS */
 const JOB_GROUPS = [];
@@ -1180,6 +1202,7 @@ function stepsBlock(j){
     return '<p class="allset">Для этой задачи всё на нужном уровне — делать нечего, можно пользоваться.</p>';
   return '<h4 class="stepshead">Что сделать под эту задачу</h4>' + gaps.map((e, i) => {
     const cap = e[0], need = e[1], lvl = capLevel(cap), r = stepRecipe(cap, need);
+    const key = lvl < 3 ? "to_L3" : "to_L" + (lvl + 1);
     const tgt = nextTarget(lvl);
     const hz = HORIZON[tgt] || "за квартал";
     if (!r)
@@ -1198,11 +1221,29 @@ function stepsBlock(j){
       '<div class="srow"><span class="sk">Когда</span><div class="sv"><p>' +
         (lvl < 3 ? "заведение основы, один заход · " : "ступень " + lvl + " → " + tgt + " · ") +
         hz + "</p></div></div>" +
-      (r.guide
-        ? '<a class="guide" href="' + esc(r.guide) + '">Пошаговая инструкция →</a>'
+      (GUIDES[cap + "/" + key]
+        ? '<button class="guidebtn" data-guide="' + esc(cap + "/" + key) +
+          '">Пошаговая инструкция</button><div class="guidebox" hidden></div>'
         : "") +
       "</div></div>";
   }).join("");
+}
+
+/* инструкция разворачивается на месте: страницу переносят одним файлом */
+function guideHTML(g){
+  if (!g) return "";
+  const list = a => "<ul>" + a.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul>";
+  return "<h6>" + esc(g.title) + "</h6>" +
+    '<p class="gwhy">' + esc(g.why) + "</p>" +
+    '<div class="gpart"><span class="gk">Что понадобится</span>' + list(g.before) + "</div>" +
+    '<ol class="gsteps">' + g.steps.map(st =>
+      "<li><b>" + esc(st.do) + "</b>" +
+      '<span class="gsee">Что вы увидите: ' + esc(st.see) + "</span>" +
+      '<span class="gfix">Если увидели другое: ' + esc(st.fix) + "</span></li>").join("") +
+    "</ol>" +
+    '<div class="gpart"><span class="gk">Проверка</span>' + list(g.check) + "</div>" +
+    '<div class="gpart"><span class="gk">Чего не делать</span>' + list(g.pitfalls) + "</div>" +
+    '<p class="gnext">Что дальше: ' + esc(g.next) + "</p>";
 }
 
 /* клетка закрылась за этот период: требуемый уровень не был набран прошлой оценкой, а теперь набран */
@@ -1241,6 +1282,17 @@ document.addEventListener("click", e => {
     navigator.clipboard.writeText(c.dataset.copy)
       .then(() => toast("Запрос скопирован — вставьте его агенту"))
       .catch(() => toast("Скопировать не вышло — выделите текст запроса вручную"));
+    return;
+  }
+  const g = e.target.closest("[data-guide]");
+  if (g) {
+    const box = g.nextElementSibling;
+    if (!box.dataset.filled) {
+      box.innerHTML = guideHTML(GUIDES[g.dataset.guide]);
+      box.dataset.filled = "1";
+    }
+    box.hidden = !box.hidden;
+    g.textContent = box.hidden ? "Пошаговая инструкция" : "Свернуть инструкцию";
     return;
   }
   const b = e.target.closest("[data-job]"); if (!b) return;
