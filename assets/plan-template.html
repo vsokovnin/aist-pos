@@ -1084,6 +1084,20 @@ function dotsScale(lvl, need){
   return s + "</span>";
 }
 
+/* что из нужного этой задаче сдвинулось с прошлой оценки; на первой оценке строки нет */
+function shiftLine(j){
+  const pairs = jobEntries(j).map(e => [capById(e[0]), e[1]]).filter(e => e[0]);
+  const grew = pairs.filter(e => e[0].levelNow > e[0].level);
+  if (!grew.length) return "";
+  const closed = pairs.filter(e => cellWon(e[0], e[1])).length;
+  return '<p class="jshift">' + (isFactual ? "За этот период" : "С прошлой оценки") +
+    " выросло способностей: " + grew.length +
+    (closed ? " · требований закрылось: " + closed
+            : " · до нужного уровня пока не дотянули") + " — " +
+    grew.map(e => esc(capShort(e[0].id).toLowerCase()) + " " + e[0].level + "→" +
+      e[0].levelNow).join(", ") + "</p>";
+}
+
 function renderDetail(){
   const j = jobById(chosen) || JOBS[0];
   const total = jobEntries(j).length, done = jobDone(j), left = jobSteps(j);
