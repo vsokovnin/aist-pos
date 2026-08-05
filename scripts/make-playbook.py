@@ -35,7 +35,7 @@ def build(out_path):
     missing = [f for f in FIELDS if not data.get(f)]
     if missing:
         fail("в плейбуке нет разделов: " + ", ".join(missing))
-    for f in ("chaosLabel", "chaosTitle", "chaosQuestion", "chaosCost",
+    for f in ("chaosLabel", "chaosTitle", "chaosQuestion",
               "digestLabel", "digestTitle", "digest", "digestFoot", "after"):
         if not data["hero"].get(f):
             fail("в сцене плейбука нет поля " + f)

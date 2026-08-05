@@ -33,9 +33,8 @@ p{margin:0 0 14px}
 .chaosbox{background:var(--secondary);border-radius:var(--radius-lg);padding:22px 24px}
 .chaosbox .big{font-family:var(--font-display);font-size:22px;font-weight:600;margin:0 0 6px}
 .chaosbox .q{font-size:17px;color:#8a5a00;margin:0 0 14px}
-.chaosbox ul{margin:0 0 16px;padding-left:20px}
+.chaosbox ul{margin:0;padding-left:20px}
 .chaosbox li{margin:8px 0;color:var(--muted-foreground);font-size:15.5px}
-.chaosbox .cost{margin:0;color:var(--subtle);font-size:14.5px}
 .digest{border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--card)}
 .dhead{background:var(--primary);color:#fff;font-family:var(--font-display);font-weight:600;padding:14px 20px}
 .drow{display:flex;gap:18px;padding:16px 22px;border-top:1px solid var(--border)}
@@ -93,7 +92,6 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
         <p class="big" id="chaosTitle"></p>
         <p class="q" id="chaosQuestion"></p>
         <ul id="pains"></ul>
-        <p class="cost" id="chaosCost"></p>
       </div>
     </div>
     <div>
@@ -173,7 +171,6 @@ const H = PB.hero;
 $("#chaosLabel").textContent = H.chaosLabel;
 $("#chaosTitle").textContent = H.chaosTitle;
 $("#chaosQuestion").textContent = H.chaosQuestion;
-$("#chaosCost").textContent = H.chaosCost;
 $("#pains").innerHTML = PB.pains.map(p => "<li>" + esc(p) + "</li>").join("");
 $("#digestLabel").textContent = H.digestLabel;
 $("#digestTitle").textContent = H.digestTitle;
