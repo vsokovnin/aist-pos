@@ -83,13 +83,16 @@ p{margin:0 0 14px}
 .ic{width:34px;height:34px;border-radius:9px;background:var(--primary-soft);color:var(--primary);
   display:grid;place-items:center;flex:none;margin-bottom:12px}
 .ic svg{width:19px;height:19px}
-.story{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px}
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
-.story .want{font-size:17px}
-.story .then{font-size:15px}
-.who{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--subtle)}
-.want{font-family:var(--font-display);font-size:18px;font-weight:600;margin:6px 0 8px}
-.then{color:var(--muted-foreground);font-size:16px;margin:0}
+.jhint{display:flex;justify-content:space-between;margin:0 0 12px}
+.jhint span{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--subtle)}
+.strip{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 0 14px}
+.jc{flex:0 0 360px;scroll-snap-align:start;background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:22px 22px 24px}
+.jbig{color:var(--primary);margin-bottom:18px}
+.jbig svg{width:44px;height:44px;stroke-width:1.3}
+.jc b{display:block;font-family:var(--font-display);font-size:18.5px;font-weight:600;line-height:1.28}
+.jc p{margin:6px 0 0;font-size:14.5px;color:var(--muted-foreground);line-height:1.5}
 ul{margin:0;padding-left:22px}
 li{margin:9px 0;color:var(--muted-foreground)}
 .two{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;align-items:stretch;margin-top:52px}
@@ -112,7 +115,8 @@ ul.minus li:before{content:"—";color:var(--subtle)}
 .start p{margin:0;font-size:18px}
 footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
   font-family:var(--font-mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--subtle)}
-@media(max-width:760px){.cards,.two,.sgrid,.zig,.ztiles,.arow,.abox{grid-template-columns:1fr}.zig.rev .ztext{order:0}
+@media(max-width:760px){.cards,.two,.zig,.ztiles,.arow,.abox{grid-template-columns:1fr}.zig.rev .ztext{order:0}
+  .jc{flex-basis:82%}
   .acap{flex-wrap:wrap;gap:10px}.acap .nm{flex:1 0 100%}.acap .lv{width:auto}
   .addr{display:block}.addr .kicker.mute{display:block;margin-top:6px}
   h1{font-size:29px}.acell{padding:16px 0 0;border-right:none;border-top:1px solid var(--border)}.acell:first-child{border-top:none;padding-top:18px}}
@@ -172,8 +176,11 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
   <h2 id="tasksTitle"></h2>
   <div class="cards" id="tasks"></div>
 
-  <h2 id="storiesTitle"></h2>
-  <div id="stories"></div>
+  <h2 id="jobsTitle"></h2>
+  <p class="sub" id="jobsSub"></p>
+  <div class="jhint"><span id="jobsHint"></span><span id="jobsCount"></span></div>
+  <div class="strip" id="jobs"></div>
+  <p class="afoot" id="jobsFoot"></p>
 
   <div class="two">
     <div class="panel yes">
@@ -263,11 +270,14 @@ $("#tasks").innerHTML = PB.tasks.items.map(t =>
   '<div class="card"><span class="ic">' + icon(t.icon) + "</span><h3>" + esc(t.title) +
   "</h3><p>" + esc(t.text) + "</p></div>").join("");
 
-$("#storiesTitle").textContent = PB.stories.title;
-$("#stories").innerHTML = '<div class="sgrid">' + PB.stories.items.map(s =>
-  '<div class="story"><span class="ic">' + icon(s.icon) + "</span>" +
-  '<div class="who">' + esc(s.who) + '</div><div class="want">' + esc(s.want) + "</div>" +
-  '<p class="then">' + esc(s.then) + "</p></div>").join("") + "</div>";
+$("#jobsTitle").textContent = PB.jobs.title;
+$("#jobsSub").textContent = PB.jobs.sub;
+$("#jobsHint").textContent = PB.jobs.hint;
+$("#jobsCount").textContent = "1—" + PB.jobs.items.length;
+$("#jobs").innerHTML = PB.jobs.items.map(j =>
+  '<div class="jc"><div class="jbig">' + jobIcon(j.icon) + "</div><b>" + esc(j.title) +
+  "</b><p>" + esc(j.short) + "</p></div>").join("");
+$("#jobsFoot").textContent = PB.jobs.foot;
 
 $("#effectTitle").textContent = PB.effect.title;
 $("#effect").innerHTML = PB.effect.items.map(i => "<li>" + esc(i) + "</li>").join("");
