@@ -312,6 +312,14 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
   text-transform:uppercase;color:var(--subtle)}
 .jsel h3{font-family:var(--font-display);font-size:21px;font-weight:600;margin:2px 0 6px}
 .jpromise{color:var(--muted-foreground);margin:0 0 14px;max-width:760px}
+.foldbtn{margin:-6px 0 18px;padding:9px 16px;border:1px solid var(--border);
+  border-radius:var(--radius-sm);background:var(--card);color:var(--primary-deep);
+  font:500 13.5px/1 var(--font-body);cursor:pointer}
+.foldbtn:hover{border-color:var(--primary);background:var(--primary-soft)}
+.tolink{display:inline-block;margin-top:10px;font-size:13.5px;color:var(--primary-deep);
+  text-decoration:none;border-bottom:1px solid rgba(0,72,178,.35)}
+.jtable td.step a{color:var(--primary-deep);text-decoration:none;
+  border-bottom:1px solid rgba(0,72,178,.3)}
 .jshift{margin:10px 0 0;padding:9px 12px;border-left:3px solid var(--primary);
   background:var(--primary-soft);border-radius:var(--radius-sm);font-size:13.5px;
   color:var(--primary-deep)}
@@ -342,7 +350,9 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
   font:400 11.5px/1.2 var(--font-body);color:var(--muted-foreground);white-space:nowrap}
 .matrix th.rh{text-align:left;font:400 13.5px/1.35 var(--font-body);padding:5px 10px 5px 0;
   border-top:1px solid var(--border);white-space:nowrap}
-.matrix th.rh .lv{font-family:var(--font-mono);font-size:11.5px;color:var(--subtle);margin-left:4px}
+.matrix th.rh .lv{font-family:var(--font-mono);font-size:13px;font-weight:600;
+  color:var(--foreground);margin-left:6px;background:var(--secondary);border-radius:4px;
+  padding:1px 6px}
 .matrix td{text-align:center;border-top:1px solid var(--border);font-family:var(--font-mono);
   font-size:12px;padding:5px 2px}
 .matrix th.rh .lv.was{color:var(--subtle);margin-left:6px}
@@ -430,7 +440,7 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
 
 <section id="kapot">
   <div class="sechead"><h2>Что под капотом</h2></div>
-  <p class="lead">Здесь видно, из чего собирается каждая задача: какая способность в ней нужна и до какого уровня. Слева — ваш уровень. Это ответ на вопрос «почему система так считает».</p>
+  <p class="lead">Здесь видно, из чего собирается каждая задача. Слева — ваш уровень сейчас. В клетках не оценки, а состояние: галочка — этой задаче уже хватает, «до 3» — столько ещё нужно дотянуть. Это ответ на вопрос «почему система так считает».</p>
   <div class="callout" id="weakBox"></div>
   <div id="matrixBox"></div>
 </section>
@@ -444,8 +454,9 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
       <button class="chip on" data-view="grouped">По направлениям</button>
     </div>
   </div>
-  <p class="lead">По каждой способности — пять ступеней обычным языком. Синим помечено, где вы сейчас, дальше — цель. Серым, если была прошлая оценка, — откуда выросли.</p>
-  <div id="capList"></div>
+  <p class="lead">Справочник: по каждой способности пять ступеней обычным языком. Нужен, когда вы хотите проверить или оспорить свой уровень. Что делать — не здесь, а в разборе выбранной задачи выше.</p>
+  <button class="foldbtn" id="rostToggle" aria-expanded="false"></button>
+  <div id="capList" hidden></div>
 </section>
 
 <section id="signaly">
@@ -1008,12 +1019,14 @@ $("#hTitle").textContent = "Зрелость вашей личной ОС";
 $("#hSub").textContent = "Где система была, где она сейчас и что двигать дальше. Страница перерисовывается на каждой оценке — открывайте её, а не переспрашивайте в чате.";
 $("#hMeta").innerHTML = [
   ["Имя", DATA.meta.name],
+  /* роль показывается только если человек её назвал: выдуманная роль хуже отсутствующей */
   ["Роль", DATA.meta.role],
   ["Оценка", (DATA.capabilities.some(c => c.levelNow !== c.level)
       ? DATA.meta.labelWas + " → " + DATA.meta.labelNow : DATA.meta.labelNow) +
       (isFactual ? " · по факту" : "")],
   ["Версия", "v" + DATA.meta.planVersion]
-].map(([l,v]) => "<div><span>" + esc(l) + "</span><b>" + esc(v) + "</b></div>").join("");
+].filter(([, v]) => String(v || "").trim())
+ .map(([l,v]) => "<div><span>" + esc(l) + "</span><b>" + esc(v) + "</b></div>").join("");
 if (DATA.meta.provenance) $("#hProv").textContent = DATA.meta.provenance; else $("#hProv").hidden = true;
 $("#foot").textContent = "AIST POS · навык " + SKILL_VERSION + " · зрелость личной ОС · " +
   DATA.meta.date + " · план v" + DATA.meta.planVersion;
@@ -1046,9 +1059,10 @@ else $("#movedBox").innerHTML = '<div class="k">Что сдвинулось' +
 /* доска задач, выбранная задача, матрица */
 let chosen = DATA.chosen;
 
-function jobCard(j, best){
+function jobCard(j, nearId){
   const total = jobEntries(j).length, done = jobDone(j), gaps = jobGaps(j);
-  const near = gaps.length && jobSteps(j) === best;
+  /* «ближе всего» — ровно одна задача: превосходная степень на двух карточках не работает */
+  const near = j.id === nearId;
   const miss = gaps.length
     ? "Не хватает: " + gaps.map(e => capShort(e[0]).toLowerCase() + " до " + e[1]).join(", ")
     : "Всё на нужном уровне";
@@ -1065,14 +1079,15 @@ function jobCard(j, best){
 
 function renderBoard(){
   const open = JOBS.filter(j => jobGaps(j).length);
-  const best = open.length ? Math.min.apply(null, open.map(jobSteps)) : 0;
+  const nearId = open.length
+    ? open.reduce((a, b) => jobSteps(b) < jobSteps(a) ? b : a).id : null;
   $("#jobBoard").innerHTML = JOB_GROUPS.map(g => {
     const list = JOBS.filter(j => j.group === g.id)
       .sort((a,b) => jobSteps(a) - jobSteps(b) || jobDone(b) - jobDone(a));
     if (!list.length) return "";
     return '<div class="gsec"><div class="ghead"><h3>' + esc(g.title) + "</h3><span>" +
       esc(g.note) + '</span></div><div class="jgrid">' +
-      list.map(j => jobCard(j, best)).join("") + "</div></div>";
+      list.map(j => jobCard(j, nearId)).join("") + "</div></div>";
   }).join("");
 }
 
@@ -1096,12 +1111,13 @@ function renderMainStep(){
     return;
   }
   const cap = gaps[0][0], need = gaps[0][1], lvl = capLevel(cap), tgt = nextTarget(lvl);
-  const r = stepRecipe(cap, need);
+  const r = stepRecipe(cap, need), all = jobSteps(j);
   $("#mainStep").innerHTML = '<div class="k">Главный шаг · ' + esc(j.title) + "</div><h3>" +
     esc(r ? r.do : capTitle(cap) + ": ступень " + lvl + " → " + tgt) + "</h3><p>" +
-    "Первое, чего не хватает выбранной задаче. " +
-    (lvl < 3 ? "Заведение основы, один заход · " : "Ступень " + lvl + " → " + tgt + " · ") +
-    HORIZON[tgt] + "</p>";
+    "Способность «" + esc(capTitle(cap)) + "»: уровень " + lvl + " → " + tgt +
+    (all > 1 ? " · первый из " + all + " шагов этой задачи" : " · единственный шаг этой задачи") +
+    " · " + HORIZON[tgt] +
+    '</p><a class="tolink" href="#vybor">Как это сделать — в разборе задачи ниже</a>';
 }
 
 /* что из нужного этой задаче сдвинулось с прошлой оценки; на первой оценке строки нет */
@@ -1130,9 +1146,12 @@ function renderDetail(){
         : (lvl < 3 ? "завести основу → уровень 3 · " + HORIZON[3]
                    : "ступень " + lvl + " → " + tgt + " · " + HORIZON[tgt]) +
           (many > 1 ? " · всего ступеней: " + many : "");
+      /* незакрытая ступень ведёт к своему рецепту ниже — иначе человек видит «что», но не «как» */
+      const stepCell = ok ? esc(step)
+        : '<a href="#rc-' + esc(e[0]) + '">' + esc(step) + " · как это сделать</a>";
       return '<tr class="' + (ok ? "ok" : "gap") + '"><td class="cap">' + esc(capTitle(e[0])) +
         '</td><td class="sc">' + dotsScale(lvl, need) + '</td><td class="need">нужен ' + need +
-        '</td><td class="you">у вас ' + lvl + '</td><td class="step">' + esc(step) + "</td></tr>";
+        '</td><td class="you">у вас ' + lvl + '</td><td class="step">' + stepCell + "</td></tr>";
     }).join("");
   $("#jobDetail").innerHTML =
     '<div class="jsel"><span class="label">Куда иду</span><h3>' + esc(j.title) + "</h3>" +
@@ -1164,10 +1183,12 @@ function stepsBlock(j){
     const tgt = nextTarget(lvl);
     const hz = HORIZON[tgt] || "за квартал";
     if (!r)
-      return '<div class="recipe"><div class="sn">' + (i + 1) + '</div><div class="sb"><h5>' +
+      return '<div class="recipe" id="rc-' + esc(cap) + '"><div class="sn">' + (i + 1) +
+        '</div><div class="sb"><h5>' +
         esc(capTitle(cap)) + '</h5><p class="pending">Ступень ' + lvl + " → " + tgt +
         " · " + hz + '. Порядок для этой ступени в рубрике пока не описан — спросите агента.</p></div></div>';
-    return '<div class="recipe"><div class="sn">' + (i + 1) + '</div><div class="sb">' +
+    return '<div class="recipe" id="rc-' + esc(cap) + '"><div class="sn">' + (i + 1) +
+      '</div><div class="sb">' +
       "<h5>" + esc(r.do) + "</h5>" +
       '<div class="srow"><span class="sk">Как сделать</span><div class="sv">' +
         '<p class="ask">' + esc(r.how) + "</p>" +
@@ -1192,7 +1213,7 @@ function renderMatrix(){
   const won = used.reduce((s, c) =>
     s + JOBS.filter(j => j.needs[c.id] && cellWon(c, j.needs[c.id])).length, 0);
   $("#matrixBox").innerHTML = '<div class="mwrap"><table class="matrix"><thead><tr>' +
-    '<th class="corner">способность · ваш уровень</th>' +
+    '<th class="corner">способность · ваш уровень сейчас</th>' +
     JOBS.map(j => "<th><span>" + esc(j.title) + "</span></th>").join("") +
     "</tr></thead><tbody>" +
     used.map(c => '<tr><th class="rh">' + esc(c.title) +
@@ -1201,12 +1222,15 @@ function renderMatrix(){
       "</span></th>" + JOBS.map(j => {
         const need = j.needs[c.id];
         if (!need) return '<td class="empty"></td>';
-        return '<td class="' + (c.levelNow >= need ? "met" : "unmet") +
-          (cellWon(c, need) ? " won" : "") + '">' + need + "</td>";
+        /* в клетке — не требуемый уровень (его читают как свой), а что с ним:
+           набран или сколько ещё дотянуть */
+        const ok = c.levelNow >= need;
+        return '<td class="' + (ok ? "met" : "unmet") + (cellWon(c, need) ? " won" : "") + '">' +
+          (ok ? "✓" : "до " + need) + "</td>";
       }).join("") + "</tr>").join("") +
     "</tbody></table></div>" +
-    '<p class="mlegend"><i class="sw met"></i>уровень набран<i class="sw unmet"></i>нужен выше' +
-    '<i class="sw empty"></i>для этой задачи не нужна' +
+    '<p class="mlegend"><i class="sw met"></i>уровень набран<i class="sw unmet"></i>' +
+    'сколько ещё дотянуть<i class="sw empty"></i>для этой задачи не нужна' +
     (won ? '<i class="sw won"></i>закрылось за этот период' : "") + "</p>";
 }
 
@@ -1264,6 +1288,19 @@ $(".vswitch").addEventListener("click", e => {
   $$("[data-view]").forEach(x => x.classList.toggle("on", x === b));
   renderCaps(b.dataset.view);
 });
+
+/* лестницы свёрнуты по умолчанию: это справочник, а не список действий */
+const rostBtn = $("#rostToggle"), rostSw = $("#rost .vswitch");
+function foldRost(open){
+  $("#capList").hidden = !open;
+  rostSw.hidden = !open;
+  rostBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  rostBtn.textContent = open
+    ? "Свернуть лестницы"
+    : "Показать лестницы по всем способностям: " + DATA.capabilities.length;
+}
+foldRost(false);
+rostBtn.addEventListener("click", () => foldRost($("#capList").hidden));
 
 /* signals */
 $("#sigBody").innerHTML = DATA.signals.map(s =>
