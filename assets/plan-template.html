@@ -312,6 +312,9 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
   text-transform:uppercase;color:var(--subtle)}
 .jsel h3{font-family:var(--font-display);font-size:21px;font-weight:600;margin:2px 0 6px}
 .jpromise{color:var(--muted-foreground);margin:0 0 14px;max-width:760px}
+.jshift{margin:10px 0 0;padding:9px 12px;border-left:3px solid var(--primary);
+  background:var(--primary-soft);border-radius:var(--radius-sm);font-size:13.5px;
+  color:var(--primary-deep)}
 .jtable{width:100%;border-collapse:collapse;margin-top:14px}
 .jtable td{padding:10px 8px;border-bottom:1px solid var(--border);font-size:14.5px;vertical-align:middle}
 .jtable td.cap{width:36%}
@@ -342,8 +345,13 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
 .matrix th.rh .lv{font-family:var(--font-mono);font-size:11.5px;color:var(--subtle);margin-left:4px}
 .matrix td{text-align:center;border-top:1px solid var(--border);font-family:var(--font-mono);
   font-size:12px;padding:5px 2px}
+.matrix th.rh .lv.was{color:var(--subtle);margin-left:6px}
+.matrix th.rh .lv.was::after{content:"→";margin-left:2px}
+.matrix th.rh .lv.up{color:var(--primary-deep);font-weight:600;margin-left:1px}
 .matrix td.met{background:var(--primary-soft);color:var(--primary-deep)}
 .matrix td.unmet{background:rgba(234,179,8,.14);color:#8a5a00}
+.matrix td.met.won{background:rgba(0,72,178,.2);box-shadow:inset 0 0 0 1px var(--primary);
+  font-weight:600}
 .matrix td.empty{color:transparent}
 .mlegend{font-size:12.5px;color:var(--muted-foreground);margin:12px 0 0;
   display:flex;align-items:center;gap:6px}
@@ -352,6 +360,7 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
 .sw.met{background:var(--primary-soft);box-shadow:inset 0 0 0 1px rgba(0,72,178,.3)}
 .sw.unmet{background:rgba(234,179,8,.14);box-shadow:inset 0 0 0 1px rgba(234,179,8,.5)}
 .sw.empty{background:var(--card);box-shadow:inset 0 0 0 1px var(--border)}
+.sw.won{background:rgba(0,72,178,.2);box-shadow:inset 0 0 0 1px var(--primary)}
 @media(max-width:900px){.jgrid{grid-template-columns:1fr}}
 
 .stepshead{font-family:var(--font-display);font-size:15px;font-weight:600;margin:22px 0 10px}
@@ -991,6 +1000,8 @@ const rungs = (lvl, need) => lvl >= need ? 0 : (lvl < 3 ? 1 + Math.max(0, need -
 const nextTarget = lvl => lvl < 3 ? 3 : lvl + 1;
 const jobSteps = j => jobEntries(j).reduce((s, e) => s + rungs(capLevel(e[0]), e[1]), 0);
 const HORIZON = { 3: "на этой неделе", 4: "в течение месяца", 5: "за квартал" };
+/* оценка по факту: мерили только то, что двигалось за период; правила — в workflows/assess.md */
+const isFactual = DATA.meta.mode === "factual";
 
 /* header */
 $("#hTitle").textContent = "Зрелость вашей личной ОС";
@@ -998,8 +1009,9 @@ $("#hSub").textContent = "Где система была, где она сейч
 $("#hMeta").innerHTML = [
   ["Имя", DATA.meta.name],
   ["Роль", DATA.meta.role],
-  ["Оценка", DATA.capabilities.some(c => c.levelNow !== c.level)
-      ? DATA.meta.labelWas + " → " + DATA.meta.labelNow : DATA.meta.labelNow],
+  ["Оценка", (DATA.capabilities.some(c => c.levelNow !== c.level)
+      ? DATA.meta.labelWas + " → " + DATA.meta.labelNow : DATA.meta.labelNow) +
+      (isFactual ? " · по факту" : "")],
   ["Версия", "v" + DATA.meta.planVersion]
 ].map(([l,v]) => "<div><span>" + esc(l) + "</span><b>" + esc(v) + "</b></div>").join("");
 if (DATA.meta.provenance) $("#hProv").textContent = DATA.meta.provenance; else $("#hProv").hidden = true;
@@ -1024,8 +1036,9 @@ $("#tiles").innerHTML = [
   '</div><div class="n">' + t.n + "</div></div>").join("");
 
 if (!DATA.moved.length) $("#movedBox").hidden = true;
-else $("#movedBox").innerHTML = '<div class="k">Что сдвинулось</div><ul>' +
-  DATA.moved.map(m => "<li><b>" + esc(m.cap) + "</b> — " + m.from + " → " + m.to +
+else $("#movedBox").innerHTML = '<div class="k">Что сдвинулось' +
+  (isFactual ? " за этот период" : "") + "</div><ul>" +
+  DATA.moved.map(m => "<li><b>" + esc(capTitle(m.cap)) + "</b> — " + m.from + " → " + m.to +
     ": " + esc(m.proof) + "</li>").join("") + "</ul>";
 
 $("#mainStep").innerHTML = '<div class="k">' + esc(DATA.mainStep.kicker) + "</div><h3>" +
@@ -1093,6 +1106,7 @@ function renderDetail(){
     '<div class="ready wide"><span class="rbar"><i style="width:' + (done / total * 100) +
     '%"></i></span><span class="rnum">готово ' + done + " из " + total +
     (left ? " · ступеней до готовности: " + left : " · задача закрыта") + "</span></div>" +
+    shiftLine(j) +
     '<table class="jtable"><tbody>' + rows + "</tbody></table>" +
     stepsBlock(j) +
     '<div class="strip">' + JOBS.map(x => '<button class="chip' +
@@ -1136,21 +1150,30 @@ function stepsBlock(j){
   }).join("");
 }
 
+/* клетка закрылась за этот период: требуемый уровень не был набран прошлой оценкой, а теперь набран */
+const cellWon = (c, need) => c.levelNow >= need && c.level < need;
+
 function renderMatrix(){
   const used = DATA.capabilities.filter(c => JOBS.some(j => j.needs[c.id]));
+  const won = used.reduce((s, c) =>
+    s + JOBS.filter(j => j.needs[c.id] && cellWon(c, j.needs[c.id])).length, 0);
   $("#matrixBox").innerHTML = '<div class="mwrap"><table class="matrix"><thead><tr>' +
     '<th class="corner">способность · ваш уровень</th>' +
     JOBS.map(j => "<th><span>" + esc(j.title) + "</span></th>").join("") +
     "</tr></thead><tbody>" +
-    used.map(c => '<tr><th class="rh">' + esc(c.title) + '<span class="lv">' + c.levelNow +
+    used.map(c => '<tr><th class="rh">' + esc(c.title) +
+      (c.levelNow > c.level ? '<span class="lv was">' + c.level + "</span>" : "") +
+      '<span class="lv' + (c.levelNow > c.level ? " up" : "") + '">' + c.levelNow +
       "</span></th>" + JOBS.map(j => {
         const need = j.needs[c.id];
         if (!need) return '<td class="empty"></td>';
-        return '<td class="' + (c.levelNow >= need ? "met" : "unmet") + '">' + need + "</td>";
+        return '<td class="' + (c.levelNow >= need ? "met" : "unmet") +
+          (cellWon(c, need) ? " won" : "") + '">' + need + "</td>";
       }).join("") + "</tr>").join("") +
     "</tbody></table></div>" +
     '<p class="mlegend"><i class="sw met"></i>уровень набран<i class="sw unmet"></i>нужен выше' +
-    '<i class="sw empty"></i>для этой задачи не нужна</p>';
+    '<i class="sw empty"></i>для этой задачи не нужна' +
+    (won ? '<i class="sw won"></i>закрылось за этот период' : "") + "</p>";
 }
 
 renderBoard(); renderDetail(); renderMatrix();

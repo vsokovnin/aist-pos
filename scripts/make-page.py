@@ -145,6 +145,36 @@ def load_jobs(icons):
     return data
 
 
+def check_factual(data, caps):
+    """Оценка по факту: сдвиг только вверх и только с доказательством из системы."""
+    if int(data["meta"].get("planVersion", 1)) < 2:
+        fail("оценка по факту не бывает первой: сравнивать не с чем, "
+             "нужна прошлая оценка и planVersion не меньше двух")
+    dropped = [c["id"] for c in caps if c["levelNow"] < c["level"]]
+    if dropped:
+        fail("в оценке по факту уровень не понижается — отсутствие следа в папке не доказывает "
+             "потерю; понижены: " + ", ".join(dropped))
+    grown = {c["id"] for c in caps if c["levelNow"] > c["level"]}
+    seen = set()
+    for m in data["moved"]:
+        cap = m.get("cap")
+        if cap not in {c["id"] for c in caps}:
+            fail("в записи о сдвиге неизвестная способность %r — нужен идентификатор из рубрики"
+                 % cap)
+        if cap not in grown:
+            fail("способность %s записана в сдвиг, но её уровень не вырос" % cap)
+        if not str(m.get("proof", "")).strip():
+            fail("у сдвига способности %s нет доказательства: в поле proof должен быть след "
+                 "в системе, а не рассуждение" % cap)
+        seen.add(cap)
+    silent = sorted(grown - seen)
+    if silent:
+        fail("выросли без записи о сдвиге и доказательства: " + ", ".join(silent))
+    if data["stageNow"]["n"] < data["stageWas"]["n"]:
+        fail("в оценке по факту общая стадия не переигрывается вниз: было %s, стало %s"
+             % (data["stageWas"]["n"], data["stageNow"]["n"]))
+
+
 def main():
     if len(sys.argv) != 3:
         fail("нужно два аргумента: profile.json и путь к plan.html")
@@ -185,6 +215,13 @@ def main():
         fail("выбранная задача %s не из каталога: %s" % (data["chosen"], ", ".join(job_ids)))
     if "nextSteps" in data:
         fail("поле nextSteps больше не нужно: шаги страница берёт из рубрики")
+
+    mode = data["meta"].get("mode", "full")
+    if mode not in ("full", "factual"):
+        fail("meta.mode бывает только full (оценка по ответам) или factual (по факту), "
+             "а не %r" % mode)
+    if mode == "factual":
+        check_factual(data, caps)
 
     version = "неизвестна"
     skill_md = ROOT / "SKILL.md"
@@ -248,7 +285,9 @@ def main():
     open_rungs = sum(1 for c, n in chosen["needs"].items() if level[c] < n)
     print("шагов:   %d открытых у выбранной задачи" % open_rungs)
     print("инструкций собрано: %d" % len(links))
-    print("оценка:  %s" % ("повторная, выросло способностей: %d" % grown if repeat else "первая"))
+    print("оценка:  %s" % ("%s, выросло способностей: %d"
+                           % ("по факту" if mode == "factual" else "повторная", grown)
+                           if repeat else "первая"))
 
 
 if __name__ == "__main__":
