@@ -12,8 +12,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FIELDS = ["title", "lead", "hero", "goal", "pains", "tasks", "how", "stories",
-          "effect", "not", "need", "privacy", "start"]
+FIELDS = ["title", "lead", "problem", "vision", "hero", "goal", "pains", "tasks",
+          "how", "stories", "effect", "not", "need", "privacy", "start"]
 
 
 def fail(msg):
@@ -35,12 +35,14 @@ def build(out_path):
     missing = [f for f in FIELDS if not data.get(f)]
     if missing:
         fail("в плейбуке нет разделов: " + ", ".join(missing))
-    for f in ("chaosLabel", "chaosTitle", "chaosQuestion",
-              "digestLabel", "digestTitle", "digest", "digestFoot", "after"):
+    for f in ("digestLabel", "digestTitle", "digest", "digestFoot", "after"):
         if not data["hero"].get(f):
             fail("в сцене плейбука нет поля " + f)
     if len(data["hero"]["digest"]) < 3:
         fail("в утренней сводке меньше трёх строк — сцена не выглядит настоящей")
+    for p in data["pains"]:
+        if not p.get("pain") or not p.get("cost"):
+            fail("у боли должны быть и формулировка, и цена")
     if len(data["stories"]["items"]) < 3:
         fail("в плейбуке меньше трёх историй — по одной истории человек не поймёт, про него ли это")
 
