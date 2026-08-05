@@ -1041,8 +1041,7 @@ else $("#movedBox").innerHTML = '<div class="k">Что сдвинулось' +
   DATA.moved.map(m => "<li><b>" + esc(capTitle(m.cap)) + "</b> — " + m.from + " → " + m.to +
     ": " + esc(m.proof) + "</li>").join("") + "</ul>";
 
-$("#mainStep").innerHTML = '<div class="k">' + esc(DATA.mainStep.kicker) + "</div><h3>" +
-  esc(DATA.mainStep.title) + "</h3><p>" + esc(DATA.mainStep.why) + "</p>";
+/* главный шаг считается от выбранной задачи в renderMainStep — в профиле его нет */
 
 /* доска задач, выбранная задача, матрица */
 let chosen = DATA.chosen;
@@ -1082,6 +1081,27 @@ function dotsScale(lvl, need){
   for (let i = 1; i <= 5; i++)
     s += '<i class="' + (i <= lvl ? "d on" : i <= need ? "d want" : "d") + '"></i>';
   return s + "</span>";
+}
+
+/* главный шаг в шапке — первый разрыв ВЫБРАННОЙ задачи, а не самая слабая способность вообще:
+   иначе шапка звала бы в одну сторону, а разбор ниже вёл в другую */
+function renderMainStep(){
+  const j = jobById(chosen) || JOBS[0];
+  const gaps = jobGaps(j)
+    .sort((a, b) => (capLevel(a[0]) - a[1]) - (capLevel(b[0]) - b[1]));
+  if (!gaps.length){
+    $("#mainStep").innerHTML = '<div class="k">Главный шаг</div><h3>Задача «' + esc(j.title) +
+      '» закрыта</h3><p>Всё нужное для неё уже на уровне. Выберите задачу ниже — ' +
+      "главный шаг пересчитается под неё.</p>";
+    return;
+  }
+  const cap = gaps[0][0], need = gaps[0][1], lvl = capLevel(cap), tgt = nextTarget(lvl);
+  const r = stepRecipe(cap, need);
+  $("#mainStep").innerHTML = '<div class="k">Главный шаг · ' + esc(j.title) + "</div><h3>" +
+    esc(r ? r.do : capTitle(cap) + ": ступень " + lvl + " → " + tgt) + "</h3><p>" +
+    "Первое, чего не хватает выбранной задаче. " +
+    (lvl < 3 ? "Заведение основы, один заход · " : "Ступень " + lvl + " → " + tgt + " · ") +
+    HORIZON[tgt] + "</p>";
 }
 
 /* что из нужного этой задаче сдвинулось с прошлой оценки; на первой оценке строки нет */
@@ -1190,7 +1210,7 @@ function renderMatrix(){
     (won ? '<i class="sw won"></i>закрылось за этот период' : "") + "</p>";
 }
 
-renderBoard(); renderDetail(); renderMatrix();
+renderBoard(); renderDetail(); renderMainStep(); renderMatrix();
 document.addEventListener("click", e => {
   const c = e.target.closest("[data-copy]");
   if (c) {
@@ -1201,7 +1221,7 @@ document.addEventListener("click", e => {
   }
   const b = e.target.closest("[data-job]"); if (!b) return;
   chosen = b.dataset.job;
-  renderBoard(); renderDetail();
+  renderBoard(); renderDetail(); renderMainStep();
   document.getElementById("vybor").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 

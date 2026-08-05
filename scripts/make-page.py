@@ -16,7 +16,7 @@ CAPS = ["memory", "context_seed", "naming", "root_file", "git", "source_map",
         "output_form", "research", "decision_log", "handover", "autonomy",
         "sign_off"]
 REQUIRED = ["meta", "stageWas", "stageNow", "directions", "weakNote", "capabilities",
-            "moved", "chosen", "mainStep", "inspection", "signals",
+            "moved", "chosen", "inspection", "signals",
             "reassess", "journal"]
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -215,6 +215,9 @@ def main():
         fail("выбранная задача %s не из каталога: %s" % (data["chosen"], ", ".join(job_ids)))
     if "nextSteps" in data:
         fail("поле nextSteps больше не нужно: шаги страница берёт из рубрики")
+    if "mainStep" in data:
+        fail("поле mainStep больше не нужно: главный шаг страница считает сама от выбранной "
+             "задачи — первый её разрыв, текст из рубрики")
 
     mode = data["meta"].get("mode", "full")
     if mode not in ("full", "factual"):
