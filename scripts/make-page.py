@@ -53,6 +53,64 @@ def load_recipes(need_L4):
     return out
 
 
+def load_guides():
+    """Пошаговые инструкции к рекомендациям. Файла нет — инструкции просто не собираются."""
+    path = ROOT / "rubric" / "guides.json"
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        fail("файл инструкций — невалидный JSON: " + str(e))
+    guides = data.get("guides", {})
+    for cap, byStep in guides.items():
+        if cap not in CAPS:
+            fail("инструкция написана для неизвестной способности " + cap)
+        for key, g in byStep.items():
+            for field in ("title", "why", "before", "steps", "check", "pitfalls", "next"):
+                if not g.get(field):
+                    fail("в инструкции %s/%s нет поля %s" % (cap, key, field))
+            for i, st in enumerate(g["steps"], 1):
+                for field in ("do", "see", "fix"):
+                    if not st.get(field):
+                        fail("в инструкции %s/%s у шага %d нет поля %s" % (cap, key, i, field))
+    return guides
+
+
+def write_guides(guides, recipes, caps_open, out_dir, version):
+    """Собирает по странице на каждую открытую рекомендацию, для которой есть инструкция."""
+    tpl_path = ROOT / "assets" / "guide-template.html"
+    if not tpl_path.exists():
+        fail("не найден шаблон инструкции " + str(tpl_path))
+    tpl = tpl_path.read_text(encoding="utf-8")
+    written = {}
+    for cap, key in caps_open:
+        g = guides.get(cap, {}).get(key)
+        if not g:
+            continue
+        payload = dict(g)
+        payload["cap"] = cap
+        payload["transition"] = key
+        payload["kicker"] = "Шаг плана · уровень %s" % key.replace("to_L", "")
+        payload["ask"] = recipes[cap][key]["how"]
+        block = "/* GUIDE */\nconst GUIDE = %s;\n/* конец GUIDE */" % json.dumps(
+            payload, ensure_ascii=False, indent=2)
+        page, n = re.subn(r"/\* GUIDE \*/.*?/\* конец GUIDE \*/", lambda m: block, tpl, flags=re.S)
+        if n != 1:
+            fail("в шаблоне инструкции не найдены маркеры GUIDE")
+        page = page.replace("<title>Инструкция</title>",
+                            "<title>%s</title>" % g["title"], 1)
+        page = page.replace('const SKILL_VERSION = "dev";',
+                            'const SKILL_VERSION = "%s";' % version, 1)
+        if "undefined" in page:
+            fail("в инструкции %s осталось undefined" % cap)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        name = "%s-%s.html" % (cap, key)
+        (out_dir / name).write_text(page, encoding="utf-8")
+        written[cap + "/" + key] = "guides/" + name
+    return written
+
+
 def load_jobs(icons):
     """Каталог задач: группы, задачи, требуемый уровень по каждой способности."""
     path = ROOT / "rubric" / "job-sets.json"
@@ -101,6 +159,7 @@ def main():
     job_ids = [j["id"] for j in jobs["jobs"]]
     need_L4 = {c for j in jobs["jobs"] for c, lvl in j["needs"].items() if lvl >= 4}
     recipes = load_recipes(need_L4)
+    guides = load_guides()
 
     try:
         data = json.loads(profile_path.read_text(encoding="utf-8"))
@@ -141,6 +200,18 @@ def main():
     if n != 1:
         fail("в шаблоне не найдены маркеры DATA")
 
+    caps_open = []
+    for c in caps:
+        lvl = c["levelNow"]
+        top = max((j["needs"].get(c["id"], 0) for j in jobs["jobs"]), default=0)
+        if lvl < top:
+            caps_open.append((c["id"], "to_L3" if lvl < 3 else "to_L%d" % (lvl + 1)))
+    links = write_guides(guides, recipes, caps_open, out_path.parent / "guides", version)
+
+    for cap, byStep in recipes.items():
+        for key, r in byStep.items():
+            r["guide"] = links.get(cap + "/" + key, "")
+
     rblock = ("/* RECIPES */\nconst RECIPES = %s;\n/* конец RECIPES */"
               % json.dumps(recipes, ensure_ascii=False, indent=2))
     out, n = re.subn(r"/\* RECIPES \*/.*?/\* конец RECIPES \*/", lambda m: rblock, out, flags=re.S)
@@ -176,6 +247,7 @@ def main():
     print("задач:   %d · готово: %d · выбрана: %s" % (len(job_ids), ready, chosen["title"]))
     open_rungs = sum(1 for c, n in chosen["needs"].items() if level[c] < n)
     print("шагов:   %d открытых у выбранной задачи" % open_rungs)
+    print("инструкций собрано: %d" % len(links))
     print("оценка:  %s" % ("повторная, выросло способностей: %d" % grown if repeat else "первая"))
 
 

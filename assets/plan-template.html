@@ -370,6 +370,9 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
 .copy:hover{border-color:var(--primary)}
 .pending{font-size:14px;color:var(--subtle)}
 .allset{margin:18px 0 0;color:var(--success-deep);font-size:14.5px}
+.guide{display:inline-block;margin-top:12px;margin-left:164px;font-size:13.5px;
+  color:var(--primary-deep);text-decoration:none;border-bottom:1px solid var(--primary-soft)}
+.guide:hover{border-bottom-color:var(--primary)}
 </style>
 </head>
 <body>
@@ -1125,7 +1128,11 @@ function stepsBlock(j){
         '<div class="sv"><p>' + esc(r.done_when) + "</p></div></div>" +
       '<div class="srow"><span class="sk">Когда</span><div class="sv"><p>' +
         (lvl < 3 ? "заведение основы, один заход · " : "ступень " + lvl + " → " + tgt + " · ") +
-        hz + "</p></div></div></div></div>";
+        hz + "</p></div></div>" +
+      (r.guide
+        ? '<a class="guide" href="' + esc(r.guide) + '">Пошаговая инструкция →</a>'
+        : "") +
+      "</div></div>";
   }).join("");
 }
 
