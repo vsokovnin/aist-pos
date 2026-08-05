@@ -20,10 +20,18 @@
 body{margin:0;background:var(--background);color:var(--foreground);
   font:17px/1.62 var(--font-body);letter-spacing:-.003em}
 .wrap{max-width:1040px;margin:0 auto;padding:52px 24px 100px}
-h1,.lead,#goalText,#howText,.layer p,#need,.privacy,.after{max-width:820px}
+#goalText,#howText,.layer p,#need,.privacy,.after{max-width:820px}
 .kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--primary)}
-h1{font-family:var(--font-display);font-size:40px;line-height:1.15;font-weight:600;margin:10px 0 16px}
-.lead{font-size:19px;color:var(--muted-foreground);margin:0}
+.kicker.mute{color:var(--subtle)}
+.addr{display:flex;justify-content:space-between;align-items:baseline;gap:20px;
+  border-bottom:1px solid var(--border);padding-bottom:12px}
+h1{font-family:var(--font-display);font-size:34px;line-height:1.16;font-weight:600;margin:14px 0 0;max-width:800px}
+.arow{display:grid;grid-template-columns:repeat(3,1fr);margin-top:26px;border-top:1px solid var(--border)}
+.acell{padding:18px 24px 0;border-right:1px solid var(--border)}
+.acell:first-child{padding-left:0}
+.acell:last-child{border-right:none}
+.acell .clabel{margin-bottom:8px}
+.acell p{margin:0;font-size:15.5px;line-height:1.5;color:var(--muted-foreground)}
 h2{font-family:var(--font-display);font-size:23px;font-weight:600;margin:52px 0 16px}
 p{margin:0 0 14px}
 .zig{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-top:40px}
@@ -91,14 +99,19 @@ ul.minus li:before{content:"—";color:var(--subtle)}
 .start p{margin:0;font-size:18px}
 footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
   font-family:var(--font-mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--subtle)}
-@media(max-width:760px){.cards,.two,.sgrid,.zig,.ztiles{grid-template-columns:1fr}.zig.rev .ztext{order:0}.layer{display:block}.layer b{display:block;margin-bottom:6px}}
+@media(max-width:760px){.cards,.two,.sgrid,.zig,.ztiles,.arow{grid-template-columns:1fr}.zig.rev .ztext{order:0}.layer{display:block}.layer b{display:block;margin-bottom:6px}
+  .addr{display:block}.addr .kicker.mute{display:block;margin-top:6px}
+  h1{font-size:29px}.acell{padding:16px 0 0;border-right:none;border-top:1px solid var(--border)}.acell:first-child{border-top:none;padding-top:18px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="kicker">AIST POS · с чего всё начинается</div>
+  <div class="addr">
+    <span class="kicker" id="headKicker"></span>
+    <span class="kicker mute" id="headRead"></span>
+  </div>
   <h1 id="title"></h1>
-  <p class="lead" id="lead"></p>
+  <div class="arow" id="headCells"></div>
 
   <div class="zig">
     <div class="ztext">
@@ -187,7 +200,10 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 $("#title").textContent = PB.title;
-$("#lead").textContent = PB.lead;
+$("#headKicker").textContent = PB.head.kicker;
+$("#headRead").textContent = PB.head.read;
+$("#headCells").innerHTML = PB.head.cells.map(c =>
+  '<div class="acell"><div class="clabel">' + esc(c.label) + "</div><p>" + esc(c.text) + "</p></div>").join("");
 const H = PB.hero;
 $("#problemKick").textContent = PB.problem.kicker;
 $("#problemTitle").textContent = PB.problem.title;

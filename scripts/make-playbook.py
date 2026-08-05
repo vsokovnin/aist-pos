@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FIELDS = ["title", "lead", "problem", "vision", "hero", "goal", "pains", "tasks",
+FIELDS = ["title", "head", "problem", "vision", "hero", "goal", "pains", "tasks",
           "how", "stories", "effect", "not", "need", "privacy", "start"]
 
 
@@ -35,6 +35,14 @@ def build(out_path):
     missing = [f for f in FIELDS if not data.get(f)]
     if missing:
         fail("в плейбуке нет разделов: " + ", ".join(missing))
+    for f in ("kicker", "read", "cells"):
+        if not data["head"].get(f):
+            fail("в шапке плейбука нет поля " + f)
+    if len(data["head"]["cells"]) != 3:
+        fail("в шапке должно быть ровно три опоры: что на выходе, что от вас, чего не потребуется")
+    for c in data["head"]["cells"]:
+        if not c.get("label") or not c.get("text"):
+            fail("у опоры в шапке должны быть и подпись, и текст")
     for f in ("digestLabel", "digestTitle", "digest", "digestFoot", "after"):
         if not data["hero"].get(f):
             fail("в сцене плейбука нет поля " + f)
