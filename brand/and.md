@@ -4,7 +4,10 @@ skill_name: and-pos
 display_name: АНД POS
 copyright: ТехноЛаб АНД
 repo: and-technolab/and-pos
+logo: and-logo.png
 ---
+
+<img src="logo.png" alt="АНД · ТехноЛаб" width="340">
 
 ## О ТехноЛаб АНД
 
