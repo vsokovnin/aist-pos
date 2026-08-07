@@ -1305,6 +1305,8 @@ document.addEventListener("click", e => {
 $("#weakBox").innerHTML = '<div class="k">Что подтянуть первым</div><p>' + esc(DATA.weakNote) + "</p>";
 
 /* inspection */
+/* осмотра не было — например, оценка прошла в вебе, без рабочей папки: секции не место на странице */
+if (!DATA.inspection.length) $("#uvidel").hidden = true;
 $("#inspBody").innerHTML = DATA.inspection.map(r =>
   "<tr><td>" + esc(r.what) + "</td><td>" + esc(r.found) + '</td><td><span class="badge ' +
   (r.verdict === "ok" ? "ok" : r.verdict === "part" ? "part" : "no") + '">' +

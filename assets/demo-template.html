@@ -1,0 +1,299 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Оценка ИИ-зрелости руководителя — AIST.tech</title>
+<style>
+:root{
+  --background:#FAFAFA; --card:#FFFFFF; --secondary:#F5F5F7;
+  --foreground:#111111; --muted-foreground:#595959; --subtle:#8A8A8E;
+  --border:#E0E0E0;
+  --primary:#0048B2; --primary-deep:#003484; --primary-soft:rgba(0,72,178,.07);
+  --font-display:"Commissioner",ui-sans-serif,system-ui,sans-serif;
+  --font-body:"Inter",ui-sans-serif,system-ui,sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --radius-sm:8px; --radius-lg:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--background);color:var(--foreground);
+  font:400 16px/1.55 var(--font-body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:0 24px}
+header.top{border-bottom:1px solid var(--border);background:var(--card)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
+.brand{font-family:var(--font-display);font-weight:600;font-size:17px;letter-spacing:-.01em}
+.brand b{color:var(--primary)}
+.brand span{color:var(--subtle);font-weight:400;font-size:13px;margin-left:10px}
+h1{font-family:var(--font-display);font-size:34px;line-height:1.15;font-weight:600;
+  letter-spacing:-.02em;margin:0 0 14px}
+h2{font-family:var(--font-display);font-size:21px;font-weight:600;margin:0 0 10px}
+.lead{color:var(--muted-foreground);font-size:17px;margin:0 0 26px;max-width:62ch}
+.kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--primary);font-weight:600;margin-bottom:14px}
+section.screen{padding:44px 0 64px}
+[hidden]{display:none !important}
+
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:0 0 30px}
+.fact{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card);padding:16px 18px}
+.fact b{display:block;font-family:var(--font-display);font-size:16px;margin-bottom:4px}
+.fact span{color:var(--muted-foreground);font-size:14px}
+
+.btn{display:inline-block;border:1px solid var(--primary);background:var(--primary);color:#fff;
+  font:500 15px/1 var(--font-body);padding:14px 24px;border-radius:var(--radius-sm);cursor:pointer}
+.btn:hover{background:var(--primary-deep);border-color:var(--primary-deep)}
+.btn.ghost{background:var(--card);color:var(--primary-deep);border-color:var(--border)}
+.btn.ghost:hover{background:var(--primary-soft);border-color:var(--primary)}
+.btn.small{font-size:13.5px;padding:9px 15px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.note{color:var(--subtle);font-size:13.5px;margin:18px 0 0;max-width:62ch}
+
+.qhead{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:8px}
+.qnum{font-family:var(--font-mono);font-size:12px;color:var(--subtle)}
+.qdir{font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--primary);font-weight:600}
+.pbar{position:relative;height:4px;background:var(--secondary);border-radius:3px;overflow:hidden;margin-bottom:26px}
+.pbar i{position:absolute;inset:0 auto 0 0;background:var(--primary);border-radius:3px;transition:width .2s}
+.qtext{font-family:var(--font-display);font-size:23px;line-height:1.3;font-weight:600;margin:0 0 22px}
+.opts{display:flex;flex-direction:column;gap:10px;margin-bottom:26px}
+.opt{display:flex;gap:13px;align-items:flex-start;text-align:left;width:100%;
+  border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card);
+  padding:15px 17px;font:400 15px/1.45 var(--font-body);color:var(--foreground);cursor:pointer}
+.opt:hover{border-color:var(--primary);background:var(--primary-soft)}
+.opt.on{border-color:var(--primary);background:var(--primary-soft);box-shadow:inset 0 0 0 1px var(--primary)}
+.opt em{font-family:var(--font-mono);font-style:normal;font-size:12px;color:var(--subtle);
+  padding-top:2px;flex:none;width:14px}
+
+.resbar{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--border)}
+.resbar .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-top:12px;padding-bottom:12px}
+.resbar .t{font-family:var(--font-display);font-weight:600;margin-right:auto}
+.banner{background:var(--primary-soft);border-left:3px solid var(--primary);
+  padding:12px 16px;font-size:14px;color:var(--primary-deep)}
+.frame{width:100%;height:calc(100vh - 128px);border:0;display:block;background:var(--card)}
+.foot{border-top:1px solid var(--border);background:var(--card);padding:22px 0;color:var(--muted-foreground);font-size:14px}
+@media (max-width:640px){
+  h1{font-size:27px} .qtext{font-size:20px} .frame{height:calc(100vh - 160px)}
+}
+</style>
+
+<header class="top"><div class="wrap">
+  <div class="brand"><b>AIST</b>.tech<span>оценка ИИ-зрелости руководителя</span></div>
+  <button class="btn ghost small" id="restart" hidden>Пройти заново</button>
+</div></header>
+
+<section class="screen" id="intro"><div class="wrap">
+  <div class="kicker">Инструмент интенсива «ИИ в стратегическом управлении»</div>
+  <h1>Где вы сейчас в работе с ИИ — и что делать дальше</h1>
+  <p class="lead">Это тот самый опросник, с которого начинается интенсив. Он меряет не знание технологий, а то, как устроена ваша собственная работа с ИИ: помнит ли агент ваш контекст, где лежат ваши материалы, что вы отдаёте ему целиком, а что оставляете за собой.</p>
+  <div class="facts">
+    <div class="fact"><b>18 вопросов</b><span>по одному на каждую способность модели</span></div>
+    <div class="fact"><b>7–8 минут</b><span>ответы — готовыми формулировками, писать ничего не нужно</span></div>
+    <div class="fact"><b>На выходе — страница</b><span>профиль, задачи и пошаговый план с готовыми запросами</span></div>
+    <div class="fact"><b>Ничего не отправляется</b><span>ответы остаются в браузере, сервер их не видит</span></div>
+  </div>
+  <div class="row">
+    <button class="btn" id="start">Пройти оценку</button>
+    <button class="btn ghost" id="peek">Показать готовый пример результата</button>
+  </div>
+  <p class="note">Пример собран на вымышленных ответах — чтобы увидеть выход, не проходя опрос. Свою страницу можно скачать файлом и открыть без интернета.</p>
+</div></section>
+
+<section class="screen" id="survey" hidden><div class="wrap">
+  <div class="qhead"><span class="qdir" id="qdir"></span><span class="qnum" id="qnum"></span></div>
+  <div class="pbar"><i id="pfill" style="width:0"></i></div>
+  <p class="qtext" id="qtext"></p>
+  <div class="opts" id="opts"></div>
+  <div class="row">
+    <button class="btn ghost small" id="back">Назад</button>
+    <span class="note" style="margin:0">Выбирайте формулировку, которая ближе всего к тому, как есть сейчас, а не к тому, как хотелось бы.</span>
+  </div>
+</div></section>
+
+<section id="result" hidden>
+  <div class="resbar"><div class="wrap">
+    <span class="t" id="rtitle">Ваша страница профиля и плана</span>
+    <button class="btn ghost small" id="toggleGrowth">Показать, как выглядит после двух дней</button>
+    <button class="btn small" id="download">Скачать страницу</button>
+  </div></div>
+  <div class="banner" id="growthNote" hidden></div>
+  <iframe class="frame" id="frame" title="Страница профиля и плана"></iframe>
+</section>
+
+<div class="foot"><div class="wrap">Оценка и страница плана — часть интенсива «ИИ в стратегическом управлении». AIST.tech</div></div>
+
+<script>
+/* PLAN */
+const PLAN_TPL = "";
+/* конец PLAN */
+
+/* RUBRIC */
+const RUBRIC = { clusters: [], caps: [] };
+/* конец RUBRIC */
+
+/* STAGES */
+const STAGES = {};
+/* конец STAGES */
+
+/* JOBSD */
+const JOBS_D = [];
+/* конец JOBSD */
+
+const $ = s => document.querySelector(s);
+const CAPS = RUBRIC.caps;
+const answers = {};           // id способности → уровень 1..5
+let idx = 0, growth = false, lastMode = "own";
+
+/* ——— опрос ——— */
+function dirTitle(id){ return (RUBRIC.clusters.find(c => c.id === id) || {}).title || ""; }
+
+function renderQuestion(){
+  const c = CAPS[idx];
+  $("#qdir").textContent = dirTitle(c.cluster);
+  $("#qnum").textContent = "Вопрос " + (idx + 1) + " из " + CAPS.length;
+  $("#pfill").style.width = (idx / CAPS.length * 100) + "%";
+  $("#qtext").textContent = c.ask;
+  $("#opts").innerHTML = c.levels.map((t, i) =>
+    '<button class="opt' + (answers[c.id] === i + 1 ? " on" : "") + '" data-lvl="' + (i + 1) +
+    '"><em>' + (i + 1) + "</em><span>" + t + "</span></button>").join("");
+  $("#back").disabled = idx === 0;
+  $("#back").style.visibility = idx === 0 ? "hidden" : "visible";
+  window.scrollTo(0, 0);
+}
+
+$("#opts").addEventListener("click", e => {
+  const b = e.target.closest("[data-lvl]"); if (!b) return;
+  answers[CAPS[idx].id] = Number(b.dataset.lvl);
+  if (idx < CAPS.length - 1) { idx++; renderQuestion(); }
+  else showResult("own");
+});
+$("#back").addEventListener("click", () => { if (idx > 0) { idx--; renderQuestion(); } });
+
+function screen(id){
+  ["intro", "survey", "result"].forEach(s => $("#" + s).hidden = s !== id);
+  $("#restart").hidden = id === "intro";
+}
+
+$("#start").addEventListener("click", () => { idx = 0; screen("survey"); renderQuestion(); });
+$("#peek").addEventListener("click", () => showResult("sample"));
+$("#restart").addEventListener("click", () => {
+  CAPS.forEach(c => delete answers[c.id]);
+  idx = 0; growth = false; screen("intro"); window.scrollTo(0, 0);
+});
+
+/* ——— профиль из ответов ——— */
+const SAMPLE = { memory:1, context_seed:2, naming:1, root_file:2, git:2, source_map:3,
+  connectors:1, capture:2, graph:2, doc_source:2, playbook:2, quality:3, output_form:2,
+  research:3, decision_log:1, handover:2, autonomy:1, sign_off:2 };
+
+function levelsFor(mode){
+  const src = mode === "sample" ? SAMPLE : answers;
+  const out = {};
+  CAPS.forEach(c => { out[c.id] = src[c.id] || 1; });
+  return out;
+}
+
+const clusterAvg = (lv, cl) => {
+  const ids = CAPS.filter(c => c.cluster === cl.id).map(c => c.id);
+  return ids.reduce((s, i) => s + lv[i], 0) / ids.length;
+};
+
+function stageOf(lv){
+  const avgs = RUBRIC.clusters.map(cl => clusterAvg(lv, cl));
+  const score = avgs.reduce((a, b) => a + b, 0) / avgs.length;
+  const n = Math.max(1, Math.min(5, Math.round(score)));
+  return { n, score: Math.round(score * 10) / 10, name: STAGES[n].name, desc: STAGES[n].desc };
+}
+
+const rungs = (lvl, need) => lvl >= need ? 0 : (lvl < 3 ? 1 + Math.max(0, need - 3) : need - lvl);
+const jobSteps = (j, lv) => Object.keys(j.needs).reduce((s, c) => s + rungs(lv[c], j.needs[c]), 0);
+
+function chosenJob(lv){
+  const open = JOBS_D.filter(j => Object.keys(j.needs).some(c => lv[c] < j.needs[c]));
+  if (!open.length) return JOBS_D[0].id;
+  return open.reduce((a, b) => jobSteps(b, lv) < jobSteps(a, lv) ? b : a).id;
+}
+
+/* через два дня берётся основа — уровень 3 — там, где задаче хватает третьего;
+   четвёртый уровень за два дня не берётся, он месяц практики (правило ступеней навыка) */
+function afterTwoDays(lv, jobId){
+  const j = JOBS_D.find(x => x.id === jobId), out = Object.assign({}, lv);
+  Object.keys(j.needs).forEach(c => {
+    if (j.needs[c] <= 3 && out[c] < 3) out[c] = 3;
+  });
+  return out;
+}
+
+function weakNote(lv){
+  const pairs = RUBRIC.clusters.map(cl => [cl, clusterAvg(lv, cl)])
+    .sort((a, b) => a[1] - b[1]);
+  const [cl, avg] = pairs[0];
+  return "Слабее всего «" + cl.title + "» — " + avg.toFixed(1) + " из 5. Задача собирается " +
+    "из способностей разных направлений, и готовность определяет самая слабая из них: " +
+    "пока это направление ниже остальных, оно держит и всё остальное.";
+}
+
+function profile(mode){
+  const base = levelsFor(mode);
+  const jobId = chosenJob(base);
+  const now = growth ? afterTwoDays(base, jobId) : base;
+  const was = growth ? base : now;
+  const moved = growth
+    ? CAPS.filter(c => now[c.id] > was[c.id]).map(c => ({
+        cap: c.id, from: was[c.id], to: now[c.id],
+        proof: c.done_when || "признак готовности описан в плане" }))
+    : [];
+  const st = stageOf(now), stWas = stageOf(was);
+  return {
+    meta: { name: "", role: "", date: new Date().toLocaleDateString("ru-RU"),
+      planVersion: growth ? 2 : 1, labelWas: "первый замер", labelNow: "сейчас",
+      provenance: growth
+        ? "Модельный пример: уровни первого замера — ваши, второй показывает, как страница выглядит, когда за два дня заведена основа по выбранной задаче. Это не замер по прошедшему потоку."
+        : "Уровни выставлены по вашим ответам. Рабочая папка не осматривалась — это демонстрация опросника, а не полная оценка.",
+      mode: "full" },
+    stageWas: stWas, stageNow: st,
+    directions: RUBRIC.clusters.map(c => ({ id: c.id, title: c.title })),
+    weakNote: weakNote(now),
+    capabilities: CAPS.map(c => ({ id: c.id, dir: c.cluster, title: c.title, short: c.title,
+      level: was[c.id], levelNow: now[c.id] })),
+    moved: moved,
+    chosen: jobId,
+    inspection: [], signals: [],
+    reassess: [
+      { id: "r-steps", label: "Шаги плана закрыты", done: false },
+      { id: "r-time", label: "Прошло не меньше трёх месяцев с этой оценки", done: false }
+    ],
+    journal: [{ date: new Date().toLocaleDateString("ru-RU"), version: growth ? 2 : 1,
+      summary: growth ? "Модельный второй замер после двух дней работы."
+                      : "Оценка по ответам на странице AIST.tech, без осмотра рабочей папки." }]
+  };
+}
+
+function buildPage(mode){
+  const data = "/* DATA */\nconst DATA = " + JSON.stringify(profile(mode), null, 2) +
+    ";\n/* конец DATA */";
+  return PLAN_TPL.replace(/\/\* DATA \*\/[\s\S]*?\/\* конец DATA \*\//, () => data);
+}
+
+function showResult(mode){
+  lastMode = mode;
+  screen("result");
+  $("#rtitle").textContent = mode === "sample"
+    ? "Пример страницы: как выглядит результат" : "Ваша страница профиля и плана";
+  $("#frame").srcdoc = buildPage(mode);
+  $("#growthNote").hidden = !growth;
+  $("#growthNote").textContent = growth
+    ? "Модельный пример. Первый замер — настоящие ответы, второй показывает ту же страницу, когда за два дня заведена основа по выбранной задаче. Способности, которым нужен четвёртый уровень, за два дня не берутся — это месяц практики, и на странице они остаются открытыми."
+    : "";
+  $("#toggleGrowth").textContent = growth
+    ? "Вернуться к первому замеру" : "Показать, как выглядит после двух дней";
+  window.scrollTo(0, 0);
+}
+
+$("#toggleGrowth").addEventListener("click", () => { growth = !growth; showResult(lastMode); });
+
+$("#download").addEventListener("click", () => {
+  const blob = new Blob([buildPage(lastMode)], { type: "text/html;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "оценка-ии-зрелости-план.html";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+});
+</script>
