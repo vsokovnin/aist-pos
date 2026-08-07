@@ -113,7 +113,8 @@ section.screen{padding:44px 0 64px}
     <button class="btn small" id="download">Скачать страницу</button>
   </div></div>
   <div class="banner" id="growthNote" hidden></div>
-  <iframe class="frame" id="frame" title="Страница профиля и плана"></iframe>
+  <iframe class="frame" id="frame" src="about:blank"
+    title="Страница профиля и плана"></iframe>
 </section>
 
 <div class="foot"><div class="wrap">Оценка и страница плана — часть интенсива «ИИ в стратегическом управлении». AIST.tech</div></div>
@@ -165,16 +166,16 @@ $("#opts").addEventListener("click", e => {
 });
 $("#back").addEventListener("click", () => { if (idx > 0) { idx--; renderQuestion(); } });
 
-function screen(id){
+function showScreen(id){
   ["intro", "survey", "result"].forEach(s => $("#" + s).hidden = s !== id);
   $("#restart").hidden = id === "intro";
 }
 
-$("#start").addEventListener("click", () => { idx = 0; screen("survey"); renderQuestion(); });
+$("#start").addEventListener("click", () => { idx = 0; showScreen("survey"); renderQuestion(); });
 $("#peek").addEventListener("click", () => showResult("sample"));
 $("#restart").addEventListener("click", () => {
   CAPS.forEach(c => delete answers[c.id]);
-  idx = 0; growth = false; screen("intro"); window.scrollTo(0, 0);
+  idx = 0; growth = false; showScreen("intro"); window.scrollTo(0, 0);
 });
 
 /* ——— профиль из ответов ——— */
@@ -271,12 +272,27 @@ function buildPage(mode){
   return PLAN_TPL.replace(/\/\* DATA \*\/[\s\S]*?\/\* конец DATA \*\//, () => data);
 }
 
+/* страница отдаётся рамке отдельным адресом, а не srcdoc: srcdoc на сотни килобайт
+   ведёт себя по-разному в разных браузерах, blob грузится как обычный документ */
+let frameUrl = null;
+function setFrame(html){
+  const f = $("#frame");
+  if (frameUrl) URL.revokeObjectURL(frameUrl);
+  frameUrl = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
+  f.src = frameUrl;
+}
+
 function showResult(mode){
   lastMode = mode;
-  screen("result");
+  showScreen("result");
   $("#rtitle").textContent = mode === "sample"
     ? "Пример страницы: как выглядит результат" : "Ваша страница профиля и плана";
-  $("#frame").srcdoc = buildPage(mode);
+  const html = buildPage(mode);
+  if (!/^<!doctype html>/i.test(html.trim())) {
+    alert("Страница не собралась. Обновите вкладку; если повторится — напишите нам.");
+    return;
+  }
+  setFrame(html);
   $("#growthNote").hidden = !growth;
   $("#growthNote").textContent = growth
     ? "Модельный пример. Первый замер — настоящие ответы, второй показывает ту же страницу, когда за два дня заведена основа по выбранной задаче. Способности, которым нужен четвёртый уровень, за два дня не берутся — это месяц практики, и на странице они остаются открытыми."
