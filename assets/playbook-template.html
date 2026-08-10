@@ -107,9 +107,18 @@ li{margin:9px 0;color:var(--muted-foreground)}
 .tlc p.you b{color:var(--primary)}
 .tlc .out{margin-top:auto;background:var(--card);border:1px solid var(--border);
   border-radius:var(--radius-md);padding:10px 12px;font-size:13.5px;color:var(--foreground)}
-.start{border:1px solid var(--primary);border-radius:var(--radius-lg);padding:22px 24px;background:var(--card)}
-.start h2{margin:0 0 8px}
-.start p{margin:0;font-size:18px}
+.talk{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card);
+  overflow:hidden;margin-top:52px}
+.thead{padding:20px 26px 2px}
+.thead h2{margin:0 0 4px;font-size:21px}
+.thead span{font-size:15.5px;color:var(--muted-foreground)}
+.line{display:flex;gap:16px;padding:16px 26px;border-top:1px solid #EFEFF2;align-items:flex-start}
+.line .w{flex:none;width:74px;font-family:var(--font-mono);font-size:10.5px;line-height:1.6;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--subtle);padding-top:3px}
+.line.me .w{color:var(--primary)}
+.line.me b{font-family:var(--font-display);font-size:19px;font-weight:600;color:var(--primary-deep)}
+.line p{margin:0;font-size:15.5px;color:var(--muted-foreground)}
+.tfoot{padding:15px 26px;background:var(--secondary);font-size:15.5px;color:var(--foreground)}
 footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
   font-family:var(--font-mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--subtle)}
 @media(max-width:760px){.rg,.zig,.ztiles,.arow,.abox,.tl{grid-template-columns:1fr}.zig.rev .ztext{order:0}
@@ -185,9 +194,14 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
   <p class="sub" id="limitsSub"></p>
   <div class="reg" id="limits"></div>
 
-  <div class="start" style="margin-top:52px">
-    <h2 id="startTitle" style="margin-top:0"></h2>
-    <p id="startText"></p>
+  <div class="talk">
+    <div class="thead">
+      <h2 id="startTitle" style="margin-top:0"></h2>
+      <span id="startSub"></span>
+    </div>
+    <div class="line me"><span class="w">Вы</span><b id="startSay"></b></div>
+    <div class="line"><span class="w">Агент</span><p id="startAgent"></p></div>
+    <div class="tfoot" id="startFoot"></div>
   </div>
 
   <footer id="foot"></footer>
@@ -283,7 +297,10 @@ $("#limits").innerHTML = PB.limits.groups.map(g =>
   (g.items ? "<ul>" + g.items.map(i => "<li>" + esc(i) + "</li>").join("") + "</ul>"
            : "<p>" + esc(g.text) + "</p>") + "</div>").join("");
 $("#startTitle").textContent = PB.start.title;
-$("#startText").textContent = PB.start.text;
+$("#startSub").textContent = PB.start.sub;
+$("#startSay").textContent = "«" + PB.start.say + "»";
+$("#startAgent").textContent = PB.start.agent;
+$("#startFoot").textContent = PB.start.foot;
 $("#foot").textContent = "AIST POS · навык " + SKILL_VERSION + " · плейбук";
 </script>
 </body>

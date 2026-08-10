@@ -95,6 +95,11 @@ def build(out_path):
             fail("в границах нет поля " + f)
     if len(data["limits"]["groups"]) != 3:
         fail("границы — это три раздела: чего не делает, что нужно от вас, где данные")
+    for f in ("title", "sub", "say", "agent", "foot"):
+        if not data["start"].get(f):
+            fail("в первом шаге нет поля " + f)
+    if "«" in data["start"]["say"]:
+        fail("фраза первого шага пишется без кавычек — их ставит вёрстка")
     for g in data["limits"]["groups"]:
         if not g.get("title") or not (g.get("items") or g.get("text")):
             fail("у раздела границ «%s» нет ни списка, ни текста" % g.get("title", "?"))
