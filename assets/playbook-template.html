@@ -20,7 +20,7 @@
 body{margin:0;background:var(--background);color:var(--foreground);
   font:17px/1.62 var(--font-body);letter-spacing:-.003em}
 .wrap{max-width:1040px;margin:0 auto;padding:52px 24px 100px}
-#need,.privacy,.after,.sub,.afoot,#mapTitle{max-width:820px}
+.after,.sub,.afoot,#mapTitle{max-width:820px}
 .kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--primary)}
 .kicker.mute{color:var(--subtle)}
 .addr{display:flex;justify-content:space-between;align-items:baseline;gap:20px;
@@ -107,26 +107,12 @@ li{margin:9px 0;color:var(--muted-foreground)}
 .tlc p.you b{color:var(--primary)}
 .tlc .out{margin-top:auto;background:var(--card);border:1px solid var(--border);
   border-radius:var(--radius-md);padding:10px 12px;font-size:13.5px;color:var(--foreground)}
-.panel{border-radius:var(--radius-lg);padding:6px 26px 24px}
-.panel h2{margin:26px 0 14px;font-size:21px}
-.panel.yes{background:var(--primary-soft)}
-.panel.yes h2{color:var(--primary-deep)}
-.panel.no{background:var(--secondary)}
-.panel.no h2{color:var(--muted-foreground)}
-ul.mark{list-style:none;padding-left:0}
-ul.mark li{position:relative;padding-left:30px;margin:14px 0;font-size:16px}
-ul.mark li:before{position:absolute;left:0;top:0;font-family:var(--font-mono);font-size:15px}
-ul.plus li{color:var(--foreground)}
-ul.plus li:before{content:"✓";color:var(--primary);font-weight:600}
-ul.minus li{color:var(--muted-foreground)}
-ul.minus li:before{content:"—";color:var(--subtle)}
-.privacy{background:var(--primary-soft);border-radius:var(--radius-lg);padding:20px 24px;color:var(--primary-deep)}
 .start{border:1px solid var(--primary);border-radius:var(--radius-lg);padding:22px 24px;background:var(--card)}
 .start h2{margin:0 0 8px}
 .start p{margin:0;font-size:18px}
 footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);
   font-family:var(--font-mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--subtle)}
-@media(max-width:760px){.two,.zig,.ztiles,.arow,.abox,.tl{grid-template-columns:1fr}.zig.rev .ztext{order:0}
+@media(max-width:760px){.rg,.zig,.ztiles,.arow,.abox,.tl{grid-template-columns:1fr}.zig.rev .ztext{order:0}
   .jc{flex-basis:82%}.tlc{padding:0 0 22px}
   .acap{flex-wrap:wrap;gap:10px}.acap .nm{flex:1 0 100%}.acap .lv{width:auto}
   .addr{display:block}.addr .kicker.mute{display:block;margin-top:6px}
@@ -290,13 +276,12 @@ $("#jobs").innerHTML = PB.jobs.items.map(j =>
   "</b><p>" + esc(j.short) + "</p></div>").join("");
 $("#jobsFoot").textContent = PB.jobs.foot;
 
-$("#notTitle").textContent = PB.not.title;
-$("#not").innerHTML = PB.not.items.map(i => "<li>" + esc(i) + "</li>").join("");
-$("#needTitle").textContent = PB.need.title;
-$("#need").innerHTML = PB.need.items.map(i => "<li>" + esc(i) + "</li>").join("");
-
-$("#privacyTitle").textContent = PB.privacy.title;
-$("#privacyText").textContent = PB.privacy.text;
+$("#limitsTitle").textContent = PB.limits.title;
+$("#limitsSub").textContent = PB.limits.sub;
+$("#limits").innerHTML = PB.limits.groups.map(g =>
+  '<div class="rg"><h3>' + esc(g.title) + "</h3>" +
+  (g.items ? "<ul>" + g.items.map(i => "<li>" + esc(i) + "</li>").join("") + "</ul>"
+           : "<p>" + esc(g.text) + "</p>") + "</div>").join("");
 $("#startTitle").textContent = PB.start.title;
 $("#startText").textContent = PB.start.text;
 $("#foot").textContent = "AIST POS · навык " + SKILL_VERSION + " · плейбук";

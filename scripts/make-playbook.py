@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 FIELDS = ["title", "head", "problem", "vision", "hero", "map", "pains",
-          "jobs", "route", "not", "need", "privacy", "start"]
+          "jobs", "route", "limits", "start"]
 
 
 def fail(msg):
@@ -90,6 +90,14 @@ def build(out_path):
         for f in ("title", "sys", "you", "out"):
             if not st.get(f):
                 fail("у шага маршрута «%s» нет поля %s" % (st.get("title", "?"), f))
+    for f in ("title", "sub", "groups"):
+        if not data["limits"].get(f):
+            fail("в границах нет поля " + f)
+    if len(data["limits"]["groups"]) != 3:
+        fail("границы — это три раздела: чего не делает, что нужно от вас, где данные")
+    for g in data["limits"]["groups"]:
+        if not g.get("title") or not (g.get("items") or g.get("text")):
+            fail("у раздела границ «%s» нет ни списка, ни текста" % g.get("title", "?"))
 
     version = "неизвестна"
     skill_md = ROOT / "SKILL.md"
