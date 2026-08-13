@@ -94,7 +94,7 @@
     },
     {
       "id": "connectors",
-      "dir": "files",
+      "dir": "capture",
       "title": "Подключение сервисов",
       "short": "Подключения",
       "level": 3,
