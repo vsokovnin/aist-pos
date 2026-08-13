@@ -87,5 +87,21 @@
     1,
     2,
     5
+  ],
+  "hardens_cells": [
+    {
+      "operation": "(ярус надёжности)",
+      "cap_id": "handover",
+      "level": 4,
+      "failure_scenario": "перенесено решением о ярусах; сценарий — в derivation/findings.json",
+      "source": "типизация находок"
+    },
+    {
+      "operation": "(ярус надёжности)",
+      "cap_id": "playbook",
+      "level": 3,
+      "failure_scenario": "перенесено решением о ярусах; сценарий — в derivation/findings.json",
+      "source": "типизация находок"
+    }
   ]
 }

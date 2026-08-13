@@ -31,6 +31,11 @@
         "connectors": 3,
         "playbook": 3,
         "quality": 3
+      },
+      "hardens": {
+        "capture": 4,
+        "connectors": 4,
+        "quality": 4
       }
     },
     {
@@ -43,13 +48,14 @@
       "needs": {
         "autonomy": 3,
         "capture": 3,
-        "connectors": 3,
-        "graph": 3,
-        "output_form": 3,
-        "playbook": 3
+        "connectors": 3
       },
       "hardens": {
         "decision_log": 3,
+        "doc_source": 3,
+        "graph": 3,
+        "output_form": 3,
+        "playbook": 3,
         "quality": 3,
         "research": 3
       }
@@ -65,10 +71,12 @@
         "autonomy": 4,
         "capture": 3,
         "connectors": 3,
-        "graph": 3,
         "output_form": 3
       },
       "hardens": {
+        "capture": 4,
+        "connectors": 4,
+        "graph": 4,
         "memory": 3,
         "playbook": 3,
         "quality": 3
@@ -84,17 +92,18 @@
       "needs": {
         "autonomy": 3,
         "connectors": 3,
-        "context_seed": 3,
         "doc_source": 3,
-        "graph": 3,
-        "memory": 3,
         "output_form": 3,
         "playbook": 3,
         "sign_off": 3
       },
       "hardens": {
         "capture": 3,
+        "context_seed": 3,
         "decision_log": 3,
+        "doc_source": 4,
+        "graph": 3,
+        "memory": 3,
         "quality": 3
       }
     },
@@ -106,17 +115,19 @@
       "short": "Решения и поручения оформлены, пока все помнят разговор.",
       "promise": "Через десять минут после встречи готовы итоги: что решили, кто что делает и к какому сроку — в том виде, в котором это можно сразу отправить участникам.",
       "needs": {
-        "autonomy": 4,
-        "capture": 3,
         "connectors": 3,
-        "graph": 3,
         "output_form": 3,
         "sign_off": 3
       },
       "hardens": {
+        "autonomy": 4,
+        "capture": 4,
+        "connectors": 4,
         "doc_source": 3,
+        "graph": 3,
         "playbook": 3,
-        "quality": 3
+        "quality": 3,
+        "sign_off": 4
       }
     },
     {
@@ -149,12 +160,12 @@
       "promise": "Прежде чем нести позицию дальше, вы получаете разбор против неё — не вообще, а из конкретной роли: финансового директора, миноритария, регулятора. Какие допущения не названы, где вывод не держится на цифрах, какие вопросы зададут первыми; каждое возражение — со ссылкой на место в ваших материалах. Две роли можно столкнуть между собой и посмотреть, где проходит спор.",
       "needs": {
         "autonomy": 3,
-        "context_seed": 3,
         "doc_source": 3,
         "playbook": 3,
         "quality": 3
       },
       "hardens": {
+        "context_seed": 3,
         "output_form": 3,
         "research": 3
       }
@@ -169,12 +180,13 @@
       "needs": {
         "autonomy": 3,
         "doc_source": 3,
-        "playbook": 3,
         "quality": 3
       },
       "hardens": {
         "context_seed": 3,
-        "output_form": 3
+        "doc_source": 4,
+        "output_form": 3,
+        "playbook": 3
       }
     },
     {
@@ -205,14 +217,15 @@
       "promise": "Вы получаете обзор по рынку или конкуренту, в котором каждое утверждение подкреплено ссылкой, а не выдумано. Следующий обзор строится поверх предыдущего.",
       "needs": {
         "autonomy": 3,
-        "playbook": 3,
         "quality": 3,
         "research": 3
       },
       "hardens": {
         "context_seed": 3,
+        "doc_source": 3,
         "memory": 3,
         "output_form": 3,
+        "playbook": 3,
         "research": 5
       }
     },
@@ -225,14 +238,15 @@
       "promise": "Перед первой встречей или сделкой у вас на руках: чем занимается компания, кто принимает решения, что о них известно публично и на что обратить внимание.",
       "needs": {
         "autonomy": 3,
-        "output_form": 3,
         "quality": 3,
         "research": 3
       },
       "hardens": {
+        "capture": 3,
         "connectors": 3,
         "context_seed": 3,
         "graph": 3,
+        "output_form": 3,
         "playbook": 3
       }
     },
@@ -246,12 +260,12 @@
       "needs": {
         "autonomy": 3,
         "doc_source": 3,
-        "memory": 3,
-        "output_form": 3,
-        "playbook": 3
+        "output_form": 3
       },
       "hardens": {
         "context_seed": 3,
+        "memory": 3,
+        "playbook": 3,
         "quality": 3
       }
     },

@@ -80,5 +80,21 @@
     95,
     96,
     97
+  ],
+  "hardens_cells": [
+    {
+      "operation": "(ярус надёжности)",
+      "cap_id": "quality",
+      "level": 3,
+      "failure_scenario": "перенесено решением о ярусах; сценарий — в derivation/findings.json",
+      "source": "типизация находок"
+    },
+    {
+      "operation": "(ярус надёжности)",
+      "cap_id": "sign_off",
+      "level": 3,
+      "failure_scenario": "перенесено решением о ярусах; сценарий — в derivation/findings.json",
+      "source": "типизация находок"
+    }
   ]
 }
