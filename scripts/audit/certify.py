@@ -167,6 +167,8 @@ def test_territory(data):
         if p.name in skip:
             continue
         d = json.loads(p.read_text(encoding="utf-8"))
+        if not isinstance(d, dict):   # служебные файлы-списки трассами не являются
+            continue
         job = d.get("job_id")
         if not job:
             continue
