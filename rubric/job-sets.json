@@ -129,10 +129,8 @@
       "needs": {
         "autonomy": 3,
         "doc_source": 3,
-        "graph": 3,
         "playbook": 3,
-        "quality": 3,
-        "sign_off": 3
+        "quality": 3
       },
       "hardens": {
         "connectors": 3,
