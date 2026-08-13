@@ -66,7 +66,7 @@ def main():
         # Собрать номера decisions с take=="accept" для этого job
         decisions = [
             f["n"] for f in findings
-            if f.get("job_id") == job_id and f.get("decision", {}).get("take") == "accept"
+            if f.get("job_id") == job_id and (f.get("decision") or {}).get("take") == "accept"
         ]
 
         output_jobs.append({
