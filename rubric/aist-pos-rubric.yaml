@@ -12,19 +12,14 @@ meta:
 clusters:
   - id: context
     title: "Контекст — агент вас знает и помнит"
-    caps: [memory, context_seed]
   - id: files
     title: "Файлы, структура, доступ"
-    caps: [naming, root_file, git, source_map, handover]
   - id: capture
     title: "Входящие и связи"
-    caps: [connectors, capture, graph]
   - id: work
     title: "Работа — как получается результат"
-    caps: [doc_source, playbook, quality, output_form, autonomy]
   - id: knowledge
     title: "Знание и решения"
-    caps: [research, decision_log, sign_off]
 
 capabilities:
   - id: memory
@@ -146,7 +141,7 @@ capabilities:
         done_when: "есть случай, когда агент остановился перед непомеченным источником, и список пополнялся за последний месяц"
 
   - id: connectors
-    cluster: files
+    cluster: capture
     title: "Подключение сервисов"
     inspect:
       - "подключённые коннекторы к ключевым системам (почта, календарь, мессенджеры)"

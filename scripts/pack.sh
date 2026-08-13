@@ -16,7 +16,7 @@ rubric="$repo/rubric/aist-pos-rubric.yaml"
 declared_caps="$(awk '/^  capabilities_count:/{print $2; exit}' "$rubric")"
 declared_cl="$(awk '/^  clusters_count:/{print $2; exit}' "$rubric")"
 real_caps="$(grep -c '^    cluster: ' "$rubric")"
-real_cl="$(grep -c '^    caps: \[' "$rubric")"
+real_cl="$(awk '/^clusters:/{f=1;next} /^capabilities:/{f=0} f && /^  - id: /{n++} END{print n+0}' "$rubric")"
 [ "$declared_caps" = "$real_caps" ] || { echo "СБОРКА ОСТАНОВЛЕНА: в рубрике $real_caps способностей, meta обещает $declared_caps"; exit 1; }
 [ "$declared_cl" = "$real_cl" ] || { echo "СБОРКА ОСТАНОВЛЕНА: в рубрике $real_cl направлений, meta обещает $declared_cl"; exit 1; }
 words="один два три четыре пять шесть семь восемь девять десять одиннадцать двенадцать тринадцать четырнадцать пятнадцать шестнадцать семнадцать восемнадцать девятнадцать двадцать"
@@ -32,6 +32,26 @@ for f in "$repo/SKILL.md" "$repo/README.md" "$repo"/docs/*.md "$repo"/workflows/
     echo "СБОРКА ОСТАНОВЛЕНА: $(basename "$f") называет другое число: $bad $badw"; exit 1; }
 done
 echo "гейт: $real_caps способностей, $real_cl направлений — документы согласованы"
+
+# Гейт направлений: поле cluster у способностей — единственный источник принадлежности;
+# множество его значений должно совпадать с множеством id направлений в шапке.
+python3 - "$rubric" <<'PY' || exit 1
+import re, sys
+text = open(sys.argv[1], encoding="utf-8").read()
+head, _, tail = text.partition("capabilities:")
+declared = set(re.findall(r"\n  - id: (\w+)\n    title: ", head.partition("clusters:")[2]))
+real = set(re.findall(r"\n    cluster: (\w+)", tail))
+if declared != real:
+    print("СБОРКА ОСТАНОВЛЕНА: направления в шапке и в способностях разошлись")
+    only_head = sorted(declared - real)
+    only_caps = sorted(real - declared)
+    if only_head:
+        print("  · только в шапке (нет ни одной способности): %s" % ", ".join(only_head))
+    if only_caps:
+        print("  · только у способностей (нет в шапке): %s" % ", ".join(only_caps))
+    sys.exit(1)
+print("гейт: направления согласованы (шапка ≡ множество cluster у способностей)")
+PY
 
 # Гейт каталога задач: способности задач существуют в рубрике, требуемые уровни в диапазоне.
 python3 - "$repo" <<'PY' || exit 1
