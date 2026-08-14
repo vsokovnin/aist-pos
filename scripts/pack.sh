@@ -182,6 +182,9 @@ if [ "$name" != "aist-pos" ]; then
 fi
 find "$stage" -name '.DS_Store' -delete
 find "$stage" -name 'aist-pos.config.yaml' -delete
+# кэш питона нарастает от версии к версии и человеку не нужен
+find "$stage" -name '__pycache__' -type d -prune -exec rm -rf {} +
+find "$stage" -name '*.pyc' -delete
 
 out="$dist/$name.skill"
 rm -f "$out"
