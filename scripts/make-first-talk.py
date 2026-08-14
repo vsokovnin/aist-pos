@@ -52,14 +52,14 @@ def build(out_path):
         fail("в rubric/quickstart.json нет вопросов")
     payload = {"ui": {f: page[f] for f in UI_FIELDS}, "questions": []}
     for q in questions:
-        if not q.get("ask") or not q.get("options"):
-            fail("у вопроса про задачу %s нет текста или вариантов" % q.get("job"))
+        if not q.get("id") or not q.get("ask") or not q.get("options"):
+            fail("у вопроса %s нет идентификатора, текста или вариантов" % q.get("id"))
         for o in q["options"]:
             if "short" in o:
                 fail("у варианта есть сокращённый ярлык — на странице показывается только полная "
                      "формулировка, сокращать нечем и незачем")
         payload["questions"].append({
-            "job": q["job"],
+            "id": q["id"],
             "ask": q["ask"],
             "options": [{"t": o["t"]} for o in q["options"]],
         })

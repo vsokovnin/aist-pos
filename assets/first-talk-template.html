@@ -168,7 +168,7 @@ function payload() {
   const rows = Q.questions.map((q, i) => {
     const p = i in picked ? picked[i] : -1;
     const chosen = p < 0 ? null : q.options[p];
-    return '    {"job": ' + JSON.stringify(q.job) +
+    return '    {"id": ' + JSON.stringify(q.id) +
            ', "pick": ' + JSON.stringify(chosen ? LETTERS[p] : null) +
            ', "text": ' + JSON.stringify(chosen ? chosen.t : null) + "}";
   });
