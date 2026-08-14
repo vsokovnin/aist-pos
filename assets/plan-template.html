@@ -93,6 +93,23 @@ h2{font-size:23px;font-weight:600;letter-spacing:-.015em}
 .mainstep h3{font-size:19px;font-weight:600;margin:8px 0 6px;letter-spacing:-.01em}
 .mainstep p{margin:0;color:var(--muted-foreground);max-width:72ch}
 
+.hyg{margin-top:14px;border:1px solid var(--border);border-radius:var(--radius-lg);
+  background:var(--card);padding:18px 20px}
+.hyg .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;
+  color:var(--subtle);font-weight:600}
+.hyg p{margin:8px 0 0;color:var(--muted-foreground);max-width:72ch;font-size:13.5px}
+.hyg .hnote{color:var(--subtle);font-size:12.5px}
+.hlist{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.hlist li{border:1px solid var(--border);border-radius:var(--radius-md);padding:8px 12px;
+  font-size:13px;display:flex;gap:10px;align-items:baseline}
+.hlist li.ok{background:var(--success-soft);border-color:transparent}
+.hlist .hlv{font-family:var(--font-mono);font-size:11.5px;color:var(--muted-foreground)}
+.hlist .hst{font-size:11.5px;color:var(--subtle)}
+.axis{font-size:13px;font-weight:600;margin:18px 0 0;letter-spacing:-.005em}
+.axisnote{font-size:12.5px;color:var(--subtle);margin:4px 0 0}
+.axis2.dim{opacity:.62}
+.nextline{display:block;font-size:12.5px;color:var(--subtle);margin-top:5px;line-height:1.4}
+
 .diag{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:36px;align-items:start}
 .diag>*{min-width:0}
 .radar-legend{display:flex;gap:18px;font-size:12.5px;color:var(--muted-foreground);margin-bottom:8px}
@@ -363,6 +380,8 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
 .matrix td.met.won{background:rgba(0,72,178,.2);box-shadow:inset 0 0 0 1px var(--primary);
   font-weight:600}
 .matrix td.empty{color:transparent}
+.matrix td.soft{background:var(--secondary);color:var(--subtle)}
+.matrix td .plus{color:var(--subtle);font-size:10px;margin-left:3px;opacity:.85}
 .mlegend{font-size:12.5px;color:var(--muted-foreground);margin:12px 0 0;
   display:flex;align-items:center;gap:6px}
 .mlegend .sw{width:13px;height:13px;border-radius:3px;display:inline-block;margin-left:12px}
@@ -370,6 +389,7 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
 .sw.met{background:var(--primary-soft);box-shadow:inset 0 0 0 1px rgba(0,72,178,.3)}
 .sw.unmet{background:rgba(234,179,8,.14);box-shadow:inset 0 0 0 1px rgba(234,179,8,.5)}
 .sw.empty{background:var(--card);box-shadow:inset 0 0 0 1px var(--border)}
+.sw.soft{background:var(--secondary);box-shadow:inset 0 0 0 1px var(--border)}
 .sw.won{background:rgba(0,72,178,.2);box-shadow:inset 0 0 0 1px var(--primary)}
 @media(max-width:900px){.jgrid{grid-template-columns:1fr}}
 
@@ -433,6 +453,7 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
   <div class="sechead"><h2>Где вы сейчас</h2></div>
   <div class="tiles" id="tiles"></div>
   <div class="moved" id="movedBox"></div>
+  <div class="hyg" id="hygBox"></div>
   <div class="mainstep" id="mainStep"></div>
 </section>
 
@@ -644,6 +665,7 @@ const GUIDES = {};
 /* JOBS */
 const JOB_GROUPS = [];
 const JOBS = [];
+const HYGIENE = { level: 3, caps: [], why: "" };
 /* конец JOBS */
 
 /* DATA */
@@ -1027,6 +1049,14 @@ const capTitle = id => (capById(id) || {}).title || CAP_TITLES[id] || id;
 const capShort = id => (capById(id) || {}).short || capTitle(id);
 const jobById = id => JOBS.find(j => j.id === id);
 const jobEntries = j => Object.keys(j.needs).map(c => [c, j.needs[c]]);
+/* вторая ось задачи: что снимает эпизодические срывы, когда задача уже заработала */
+const hardEntries = j => Object.keys(j.hardens || {})
+  .filter(c => !j.needs[c] || j.hardens[c] > j.needs[c]).map(c => [c, j.hardens[c]]);
+const hardGaps = j => hardEntries(j).filter(e => capLevel(e[0]) < e[1]);
+const hardDone = j => hardEntries(j).filter(e => capLevel(e[0]) >= e[1]).length;
+/* опора: заводится один раз и стоит под каждой задачей, поэтому вне списка задач */
+const hygEntries = () => (HYGIENE.caps || []).map(c => [c, HYGIENE.level]);
+const hygGaps = () => hygEntries().filter(e => capLevel(e[0]) < e[1]);
 const jobGaps = j => jobEntries(j).filter(e => capLevel(e[0]) < e[1]);
 const jobDone = j => jobEntries(j).filter(e => capLevel(e[0]) >= e[1]).length;
 /* ниже третьего уровня основа заводится одним шагом; четвёртый и пятый берутся по одной ступени */
@@ -1089,15 +1119,24 @@ function jobCard(j, nearId){
   const miss = gaps.length
     ? "Не хватает: " + gaps.map(e => capShort(e[0]).toLowerCase() + " до " + e[1]).join(", ")
     : "Всё на нужном уровне";
+  const hgaps = hardGaps(j), hlist = hardEntries(j);
+  const nextLine = !hlist.length ? ""
+    : hgaps.length
+      ? "дальше, чтобы не подводило: не хватает " +
+        hgaps.slice(0, 3).map(e => capShort(e[0]).toLowerCase()).join(", ") +
+        (hgaps.length > 3 ? " и ещё " + (hgaps.length - 3) : "")
+      : "не подводит: всё на уровне";
   return '<button class="jcard' + (near ? " near" : "") + (gaps.length ? "" : " done") +
     (j.id === chosen ? " cur" : "") + '" data-job="' + j.id + '">' +
     '<span class="jhead"><span class="ico">' + icon(j.icon) + "</span><b>" + esc(j.title) + "</b>" +
     (near ? '<span class="flag">ближе всего</span>'
-          : gaps.length ? "" : '<span class="flag">готово</span>') +
+          : gaps.length ? ""
+          : '<span class="flag">' + (hgaps.length ? "готово" : "работает надёжно") + "</span>") +
     '</span><span class="jshort">' + esc(j.short) + "</span>" +
     '<span class="ready"><span class="rbar"><i style="width:' + (done / total * 100) +
     '%"></i></span><span class="rnum">' + done + " из " + total + "</span></span>" +
-    '<span class="miss">' + esc(miss) + "</span></button>";
+    '<span class="miss">' + esc(miss) + "</span>" +
+    (nextLine ? '<span class="nextline">' + esc(nextLine) + "</span>" : "") + "</button>";
 }
 
 function renderBoard(){
@@ -1128,8 +1167,19 @@ function renderMainStep(){
   const gaps = jobGaps(j)
     .sort((a, b) => (capLevel(a[0]) - a[1]) - (capLevel(b[0]) - b[1]));
   if (!gaps.length){
+    /* первая ось закрыта — зовём ко второй: иначе «готово» читается как «всё» */
+    const hg = hardGaps(j).sort((a, b) => (capLevel(a[0]) - a[1]) - (capLevel(b[0]) - b[1]));
+    if (hg.length){
+      const hc = hg[0][0], hl = capLevel(hc), ht = nextTarget(hl), hr = stepRecipe(hc, hg[0][1]);
+      $("#mainStep").innerHTML = '<div class="k">Главный шаг · ' + esc(j.title) + "</div><h3>" +
+        esc(hr ? hr.do : capTitle(hc) + ": ступень " + hl + " → " + ht) +
+        "</h3><p>Задача уже работает. Чтобы перестала подводить — способность «" +
+        esc(capTitle(hc)) + "»: уровень " + hl + " → " + ht + " · " + (HORIZON[ht] || "за квартал") +
+        '</p><a class="tolink" href="#vybor">Что ещё в этом круге — в разборе задачи ниже</a>';
+      return;
+    }
     $("#mainStep").innerHTML = '<div class="k">Главный шаг</div><h3>Задача «' + esc(j.title) +
-      '» закрыта</h3><p>Всё нужное для неё уже на уровне. Выберите задачу ниже — ' +
+      '» работает надёжно</h3><p>И заработала, и подводить перестала. Выберите задачу ниже — ' +
       "главный шаг пересчитается под неё.</p>";
     return;
   }
@@ -1157,10 +1207,10 @@ function shiftLine(j){
       e[0].levelNow).join(", ") + "</p>";
 }
 
-function renderDetail(){
-  const j = jobById(chosen) || JOBS[0];
-  const total = jobEntries(j).length, done = jobDone(j), left = jobSteps(j);
-  const rows = jobEntries(j)
+/* строки таблицы задачи; linked=true — ступень ведёт к рецепту ниже (только первая ось:
+   рецепты под карточкой печатаются для её разрывов) */
+function jobRows(entries, linked, pending){
+  return entries
     .sort((a,b) => (capLevel(a[0]) - a[1]) - (capLevel(b[0]) - b[1]))
     .map(e => {
       const lvl = capLevel(e[0]), need = e[1], ok = lvl >= need, tgt = nextTarget(lvl);
@@ -1169,13 +1219,40 @@ function renderDetail(){
         : (lvl < 3 ? "завести основу → уровень 3 · " + HORIZON[3]
                    : "ступень " + lvl + " → " + tgt + " · " + HORIZON[tgt]) +
           (many > 1 ? " · всего ступеней: " + many : "");
-      /* незакрытая ступень ведёт к своему рецепту ниже — иначе человек видит «что», но не «как» */
-      const stepCell = ok ? esc(step)
-        : '<a href="#rc-' + esc(e[0]) + '">' + esc(step) + " · как это сделать</a>";
+      let stepCell;
+      if (ok) stepCell = esc(step);
+      else if (linked)
+        /* незакрытая ступень ведёт к своему рецепту ниже — иначе человек видит «что», но не «как» */
+        stepCell = '<a href="#rc-' + esc(e[0]) + '">' + esc(step) + " · как это сделать</a>";
+      else if (pending && pending.indexOf(e[0]) >= 0)
+        /* та же способность ещё не закрыта в первом круге — не двоим один и тот же шаг */
+        stepCell = "сначала — в круге «чтобы заработало»";
+      else if (stepRecipe(e[0], need)) stepCell = esc(step);
+      else stepCell = esc(step) + " · порядок для этой ступени пока не описан";
       return '<tr class="' + (ok ? "ok" : "gap") + '"><td class="cap">' + esc(capTitle(e[0])) +
         '</td><td class="sc">' + dotsScale(lvl, need) + '</td><td class="need">нужен ' + need +
         '</td><td class="you">у вас ' + lvl + '</td><td class="step">' + stepCell + "</td></tr>";
     }).join("");
+}
+
+/* вторая ось задачи. Не прячем, пока первая открыта: иначе «готово» читается как «всё» */
+function hardBlock(j){
+  const ent = hardEntries(j);
+  if (!ent.length) return "";
+  const open = jobGaps(j).length;
+  return '<div class="axis2' + (open ? " dim" : "") + '">' +
+    '<h4 class="axis">Чтобы не подводило</h4><p class="axisnote">' +
+    (open ? "Это следующий круг — к нему вернётесь, когда задача заработает."
+          : "Задача уже работает. Вот что снимет эпизодические срывы.") +
+    " Готово " + hardDone(j) + " из " + ent.length + ".</p>" +
+    '<table class="jtable"><tbody>' +
+    jobRows(ent, false, jobGaps(j).map(e => e[0])) + "</tbody></table></div>";
+}
+
+function renderDetail(){
+  const j = jobById(chosen) || JOBS[0];
+  const total = jobEntries(j).length, done = jobDone(j), left = jobSteps(j);
+  const rows = jobRows(jobEntries(j), true);
   $("#jobDetail").innerHTML =
     '<div class="jsel"><span class="label">Куда иду</span><h3>' + esc(j.title) + "</h3>" +
     '<p class="jpromise">' + esc(j.promise) + "</p>" +
@@ -1183,7 +1260,9 @@ function renderDetail(){
     '%"></i></span><span class="rnum">готово ' + done + " из " + total +
     (left ? " · ступеней до готовности: " + left : " · задача закрыта") + "</span></div>" +
     shiftLine(j) +
+    '<h4 class="axis">Чтобы заработало</h4>' +
     '<table class="jtable"><tbody>' + rows + "</tbody></table>" +
+    hardBlock(j) +
     stepsBlock(j) +
     '<div class="strip">' + JOBS.map(x => '<button class="chip' +
       (x.id === chosen ? " cur" : "") + '" data-job="' + x.id + '">' + esc(x.title) +
@@ -1251,7 +1330,8 @@ function guideHTML(g){
 const cellWon = (c, need) => c.levelNow >= need && c.level < need;
 
 function renderMatrix(){
-  const used = DATA.capabilities.filter(c => JOBS.some(j => j.needs[c.id]));
+  const used = DATA.capabilities.filter(c =>
+    JOBS.some(j => j.needs[c.id] || (j.hardens || {})[c.id]));
   const won = used.reduce((s, c) =>
     s + JOBS.filter(j => j.needs[c.id] && cellWon(c, j.needs[c.id])).length, 0);
   $("#matrixBox").innerHTML = '<div class="mwrap"><table class="matrix"><thead><tr>' +
@@ -1263,20 +1343,49 @@ function renderMatrix(){
       '<span class="lv' + (c.levelNow > c.level ? " up" : "") + '">' + c.levelNow +
       "</span></th>" + JOBS.map(j => {
         const need = j.needs[c.id];
+        const hard = (j.hardens || {})[c.id];
+        if (!need && hard)
+          /* светлая клетка — нужна не для запуска, а чтобы задача не подводила */
+          return '<td class="soft">' + (c.levelNow >= hard ? "✓" : "до " + hard) + "</td>";
         if (!need) return '<td class="empty"></td>';
         /* в клетке — не требуемый уровень (его читают как свой), а что с ним:
            набран или сколько ещё дотянуть */
         const ok = c.levelNow >= need;
+        /* та же способность нужна глубже, чтобы задача не подводила — договариваем в клетке */
+        const plus = hard && hard > need && c.levelNow < hard
+          ? '<span class="plus">·до ' + hard + "</span>" : "";
         return '<td class="' + (ok ? "met" : "unmet") + (cellWon(c, need) ? " won" : "") + '">' +
-          (ok ? "✓" : "до " + need) + "</td>";
+          (ok ? "✓" : "до " + need) + plus + "</td>";
       }).join("") + "</tr>").join("") +
     "</tbody></table></div>" +
     '<p class="mlegend"><i class="sw met"></i>уровень набран<i class="sw unmet"></i>' +
-    'сколько ещё дотянуть<i class="sw empty"></i>для этой задачи не нужна' +
+    'сколько ещё дотянуть<i class="sw soft"></i>нужна, чтобы задача не подводила' +
+    '<i class="sw empty"></i>для этой задачи не нужна' +
     (won ? '<i class="sw won"></i>закрылось за этот период' : "") + "</p>";
 }
 
-renderBoard(); renderDetail(); renderMainStep(); renderMatrix();
+/* опора вне списка задач: она не про одну задачу, а про файлы и данные под всеми */
+function renderHygiene(){
+  const ent = hygEntries();
+  if (!ent.length) { $("#hygBox").hidden = true; return; }
+  const rows = ent.map(e => {
+    const lvl = capLevel(e[0]), ok = lvl >= e[1];
+    return '<li class="' + (ok ? "ok" : "gap") + '"><b>' + esc(capTitle(e[0])) + "</b>" +
+      '<span class="hlv">уровень ' + lvl + " из 5</span><span class=\"hst\">" +
+      (ok ? "набран" : "нужен " + e[1]) + "</span></li>";
+  }).join("");
+  $("#hygBox").innerHTML =
+    '<div class="k">Файлы и данные: сохранность, поиск, доступ</div>' +
+    "<p>Заводится один раз и работает на любую задачу: работа не теряется, " +
+    "нужный файл находится, конфиденциальное не уходит не туда.</p>" +
+    '<ul class="hlist">' + rows + "</ul>" +
+    '<p class="hnote">' + (hygGaps().length
+      ? "Пока это не заведено, любая задача стоит на песке: потерянный файл или ушедшее " +
+        "не туда конфиденциальное отменяют результат целиком."
+      : "Здесь всё на месте: то, что вы построите дальше, на этом и держится.") + "</p>";
+}
+
+renderHygiene(); renderBoard(); renderDetail(); renderMainStep(); renderMatrix();
 document.addEventListener("click", e => {
   const c = e.target.closest("[data-copy]");
   if (c) {

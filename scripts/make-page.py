@@ -102,12 +102,21 @@ def load_jobs(icons):
         needs = j.get("needs")
         if not needs:
             fail("у задачи %s не указано, какие способности и до какого уровня нужны" % j["id"])
-        for cap, lvl in needs.items():
-            if cap not in CAPS:
-                fail("задача %s требует неизвестной способности %s" % (j["id"], cap))
-            if not isinstance(lvl, int) or not 1 <= lvl <= 5:
-                fail("в задаче %s у способности %s требуемый уровень должен быть числом от 1 до 5"
-                     % (j["id"], cap))
+        for tier in ("needs", "hardens"):
+            for cap, lvl in (j.get(tier) or {}).items():
+                if cap not in CAPS:
+                    fail("задача %s требует неизвестной способности %s" % (j["id"], cap))
+                if not isinstance(lvl, int) or not 1 <= lvl <= 5:
+                    fail("в задаче %s у способности %s требуемый уровень должен быть числом "
+                         "от 1 до 5" % (j["id"], cap))
+    # Опора: не про отдельную задачу, а про файлы и данные под всеми — потому и верхним уровнем.
+    hygiene = data.get("hygiene") or {}
+    for cap in hygiene.get("caps", []):
+        if cap not in CAPS:
+            fail("в опоре неизвестная способность " + cap)
+    lvl = hygiene.get("level")
+    if hygiene.get("caps") and (not isinstance(lvl, int) or not 1 <= lvl <= 5):
+        fail("у опоры требуемый уровень должен быть числом от 1 до 5")
     return data
 
 
@@ -241,9 +250,12 @@ def main():
     if n != 1:
         fail("в шаблоне не найдены маркеры RECIPES")
 
-    jblock = ("/* JOBS */\nconst JOB_GROUPS = %s;\nconst JOBS = %s;\n/* конец JOBS */"
+    jblock = ("/* JOBS */\nconst JOB_GROUPS = %s;\nconst JOBS = %s;\nconst HYGIENE = %s;\n"
+              "/* конец JOBS */"
               % (json.dumps(jobs["groups"], ensure_ascii=False, indent=2),
-                 json.dumps(jobs["jobs"], ensure_ascii=False, indent=2)))
+                 json.dumps(jobs["jobs"], ensure_ascii=False, indent=2),
+                 json.dumps(jobs.get("hygiene") or {"level": 3, "caps": []},
+                            ensure_ascii=False, indent=2)))
     out, n = re.subn(r"/\* JOBS \*/.*?/\* конец JOBS \*/", lambda m: jblock, out, flags=re.S)
     if n != 1:
         fail("в шаблоне не найдены маркеры JOBS")
