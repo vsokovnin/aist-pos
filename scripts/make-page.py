@@ -179,12 +179,20 @@ def main():
     ids = [c.get("id") for c in caps]
     if sorted(ids) != sorted(CAPS):
         fail("нужны ровно %d способностей: %s" % (len(CAPS), ", ".join(CAPS)))
+    dir_ids = {d.get("id") for d in data.get("directions", [])}
     for c in caps:
         for key in ("level", "levelNow"):
             if not isinstance(c.get(key), int) or not 1 <= c[key] <= 5:
                 fail("у способности %s поле %s должно быть числом от 1 до 5" % (c["id"], key))
         if "ladder" in c:
             fail("лестницы уже в шаблоне — уберите поле ladder у %s" % c["id"])
+        # short и dir стоят на паутинке: без них подпись луча пустая, а сектор направления рвётся
+        if not str(c.get("short", "")).strip():
+            fail("у способности %s нет короткой подписи short — она подписывает луч паутинки" % c["id"])
+        if c.get("dir") not in dir_ids:
+            fail("у способности %s направление %r не из списка directions" % (c["id"], c.get("dir")))
+        if "assumed" in c and not isinstance(c["assumed"], bool):
+            fail("у способности %s поле assumed бывает только true или false" % c["id"])
 
     if data["chosen"] not in job_ids:
         fail("выбранная задача %s не из каталога: %s" % (data["chosen"], ", ".join(job_ids)))
