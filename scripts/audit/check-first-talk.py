@@ -33,9 +33,14 @@ def main():
     measured = set()
 
     if not quick.get("render_rule"):
-        bad.append("не записано правило показа: полные варианты в вопросе, ярлыки в форме")
+        bad.append("не записано правило показа: страница с полными формулировками, "
+                   "запасной путь — ярлыки в форме")
     if not quick.get("conflict_rule"):
         bad.append("не записано правило на случай, когда ответы про одну способность разошлись")
+    if not quick.get("answer_format"):
+        bad.append("не записано, в каком виде ответ приходит со страницы первого разговора")
+    if not quick.get("page"):
+        bad.append("нет текстов страницы первого разговора — собирать её не из чего")
 
     for q in quick["questions"]:
         jid = q.get("job")

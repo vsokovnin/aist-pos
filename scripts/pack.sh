@@ -154,6 +154,12 @@ python3 "$repo/scripts/make-playbook.py" "$repo/playbook.html" >/dev/null || {
   echo "СБОРКА ОСТАНОВЛЕНА: не собрался плейбук"; exit 1; }
 echo "гейт: плейбук собран"
 
+# Страница первого разговора: на ней человек отвечает, видя формулировки целиком.
+# Сборщик сам проверяет, что каждая формулировка доехала дословно и что вёрстка её не режет.
+python3 "$repo/scripts/make-first-talk.py" "$repo/first-talk.html" >/dev/null || {
+  echo "СБОРКА ОСТАНОВЛЕНА: не собралась страница первого разговора"; exit 1; }
+echo "гейт: страница первого разговора собрана"
+
 mkdir -p "$dist" "$stage/$name"
 
 # В архив идёт только содержимое навыка: ни .git, ни личных данных, ни артефактов сборки.
@@ -164,6 +170,7 @@ SKILL.md
 README.md
 LICENSE
 playbook.html
+first-talk.html
 workflows
 rubric
 templates

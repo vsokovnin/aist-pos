@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIST POS — первый разговор</title>
+<style>
+:root{
+  --background:#FAFAFA; --card:#FFFFFF; --secondary:#F5F5F7;
+  --foreground:#111111; --muted-foreground:#595959; --subtle:#8A8A8E;
+  --border:#E0E0E0;
+  --primary:#0048B2; --primary-deep:#003484; --primary-soft:rgba(0,72,178,.06);
+  --success-deep:#0f7a37;
+  --font-display:"Commissioner",ui-sans-serif,system-ui,sans-serif;
+  --font-body:"Inter",ui-sans-serif,system-ui,sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --radius-sm:8px; --radius-md:10px; --radius-lg:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--background);color:var(--foreground);
+  font:17px/1.62 var(--font-body);letter-spacing:-.003em}
+.wrap{max-width:860px;margin:0 auto;padding:52px 24px 140px}
+.kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--primary)}
+.addr{display:flex;justify-content:space-between;align-items:baseline;gap:20px;
+  border-bottom:1px solid var(--border);padding-bottom:12px}
+.addr .mute{color:var(--subtle)}
+h1{font-family:var(--font-display);font-size:34px;line-height:1.16;font-weight:600;margin:16px 0 0}
+.intro{margin:14px 0 0;color:var(--muted-foreground);font-size:16.5px}
+.intro b{color:var(--foreground);font-weight:500}
+
+.q{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:24px 26px 20px;margin-top:22px}
+.q.done{border-color:#C7D6EC}
+.qhead{display:flex;gap:14px;align-items:baseline}
+.qnum{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;color:var(--subtle);
+  flex:none;padding-top:4px}
+.q h2{font-family:var(--font-display);font-size:21px;line-height:1.34;font-weight:600;margin:0 0 4px}
+.opts{margin-top:16px}
+.opt{display:flex;gap:15px;align-items:flex-start;width:100%;text-align:left;
+  background:var(--secondary);border:1px solid transparent;border-radius:var(--radius-md);
+  padding:14px 16px;margin-top:9px;cursor:pointer;font:inherit;color:inherit;
+  transition:border-color .12s,background .12s}
+.opt:hover{border-color:#C7D6EC}
+.opt:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.opt .ltr{flex:none;width:26px;height:26px;border-radius:50%;background:var(--card);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-size:13.5px;font-weight:600;color:var(--muted-foreground)}
+.opt .txt{flex:1;font-size:16px;line-height:1.5}
+.opt.on{background:var(--primary-soft);border-color:var(--primary)}
+.opt.on .ltr{background:var(--primary);border-color:var(--primary);color:#fff}
+.skip{background:none;padding:12px 16px;margin-top:6px}
+.skip .txt{color:var(--subtle);font-size:14.5px}
+.skip.on{background:var(--secondary);border-color:var(--border)}
+.skip.on .txt{color:var(--muted-foreground)}
+
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(250,250,250,.94);
+  backdrop-filter:blur(8px);border-top:1px solid var(--border);z-index:5}
+.barin{max-width:860px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;
+  justify-content:space-between;gap:18px}
+.count{font-size:15px;color:var(--muted-foreground)}
+.count b{font-weight:500;color:var(--foreground)}
+.btn{font:inherit;font-size:16px;font-weight:500;background:var(--primary);color:#fff;border:none;
+  border-radius:var(--radius-md);padding:12px 22px;cursor:pointer}
+.btn:disabled{background:var(--border);color:var(--subtle);cursor:default}
+.btn:hover:not(:disabled){background:var(--primary-deep)}
+
+.out{margin-top:34px;border:1px solid var(--primary);border-radius:var(--radius-lg);
+  background:var(--card);overflow:hidden}
+.out[hidden]{display:none}
+.outhead{padding:18px 24px 16px}
+.outhead b{font-family:var(--font-display);font-size:19px;font-weight:600;display:block}
+.outhead p{margin:6px 0 0;color:var(--muted-foreground);font-size:15.5px}
+.state{margin:12px 0 0;font-size:14.5px;color:var(--success-deep)}
+.state.warn{color:#8a5a00}
+pre{margin:0;padding:18px 24px;background:var(--secondary);border-top:1px solid var(--border);
+  font-family:var(--font-mono);font-size:12.5px;line-height:1.55;overflow-x:auto;
+  white-space:pre;user-select:all}
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--border);
+  font-family:var(--font-mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--subtle)}
+@media(max-width:640px){
+  .wrap{padding:34px 16px 150px}
+  h1{font-size:27px}
+  .q{padding:20px 18px 16px}
+  .q h2{font-size:19px}
+  .qhead{display:block}
+  .qnum{display:block;margin-bottom:6px}
+  .barin{padding:12px 16px;flex-wrap:wrap}
+  .btn{flex:1}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="addr">
+    <span class="kicker" id="headKicker"></span>
+    <span class="kicker mute" id="headRead"></span>
+  </div>
+  <h1 id="title"></h1>
+  <p class="intro" id="intro"></p>
+
+  <div id="questions"></div>
+
+  <div class="out" id="out" hidden>
+    <div class="outhead">
+      <b id="outTitle"></b>
+      <p id="outText"></p>
+      <p class="state" id="outState"></p>
+    </div>
+    <pre id="outJson"></pre>
+  </div>
+
+  <footer id="foot"></footer>
+</div>
+
+<div class="bar">
+  <div class="barin">
+    <span class="count" id="count"></span>
+    <button class="btn" id="go" disabled></button>
+  </div>
+</div>
+
+<script>
+/* QUIZ */
+const Q = {};
+/* конец QUIZ */
+
+const SKILL_VERSION = "dev";   /* подставляется сборщиком */
+const LETTERS = ["А", "Б", "В", "Г", "Д", "Е", "Ж", "З"];
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* выбор человека: индекс варианта, -1 — «такой работы нет»; вопроса нет в ключах — не отвечено */
+const picked = {};
+
+$("#headKicker").textContent = Q.ui.kicker;
+$("#headRead").textContent = Q.ui.read;
+$("#title").textContent = Q.ui.title;
+$("#intro").textContent = Q.ui.intro;
+$("#go").textContent = Q.ui.button;
+$("#outTitle").textContent = Q.ui.outTitle;
+$("#outText").textContent = Q.ui.outText;
+$("#foot").textContent = "AIST POS · навык " + SKILL_VERSION + " · первый разговор";
+
+$("#questions").innerHTML = Q.questions.map((q, qi) =>
+  '<section class="q" id="q' + qi + '">' +
+    '<div class="qhead"><span class="qnum">' + (qi + 1) + " / " + Q.questions.length + "</span>" +
+      "<h2>" + esc(q.ask) + "</h2></div>" +
+    '<div class="opts">' +
+      q.options.map((o, oi) =>
+        '<button type="button" class="opt" data-q="' + qi + '" data-o="' + oi + '">' +
+          '<span class="ltr">' + LETTERS[oi] + "</span>" +
+          '<span class="txt">' + esc(o.t) + "</span></button>").join("") +
+      '<button type="button" class="opt skip" data-q="' + qi + '" data-o="-1">' +
+        '<span class="ltr">—</span><span class="txt">' + esc(Q.ui.skip) + "</span></button>" +
+    "</div></section>").join("");
+
+function answered() {
+  return Q.questions.filter((q, i) => i in picked).length;
+}
+
+function refresh() {
+  const n = answered();
+  $("#count").innerHTML = esc(Q.ui.count) + " <b>" + n + " / " + Q.questions.length + "</b>";
+  $("#go").disabled = n === 0;
+}
+
+function payload() {
+  const rows = Q.questions.map((q, i) => {
+    const p = i in picked ? picked[i] : -1;
+    const chosen = p < 0 ? null : q.options[p];
+    return '    {"job": ' + JSON.stringify(q.job) +
+           ', "pick": ' + JSON.stringify(chosen ? LETTERS[p] : null) +
+           ', "text": ' + JSON.stringify(chosen ? chosen.t : null) + "}";
+  });
+  return '{\n  "aist_pos": "first-talk",\n  "version": ' + JSON.stringify(SKILL_VERSION) +
+         ',\n  "answers": [\n' + rows.join(",\n") + "\n  ]\n}";
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest(".opt");
+  if (!b) return;
+  const qi = +b.dataset.q, oi = +b.dataset.o;
+  picked[qi] = oi;
+  const sec = $("#q" + qi);
+  sec.classList.add("done");
+  sec.querySelectorAll(".opt").forEach(x => x.classList.toggle("on", +x.dataset.o === oi));
+  refresh();
+});
+
+$("#go").addEventListener("click", () => {
+  const text = payload();
+  $("#outJson").textContent = text;
+  $("#out").hidden = false;
+  const shown = st => { $("#outState").textContent = Q.ui[st]; $("#outState").className = "state" + (st === "copyFail" ? " warn" : ""); };
+  const fallback = () => {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+    ta.remove();
+    shown(ok ? "copyOk" : "copyFail");
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => shown("copyOk"), fallback);
+  } else {
+    fallback();
+  }
+  $("#out").scrollIntoView({behavior: "smooth", block: "start"});
+});
+
+refresh();
+</script>
+</body>
+</html>
