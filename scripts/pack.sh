@@ -137,6 +137,59 @@ PY
 python3 "$repo/scripts/audit/echo-check.py" || {
   echo "СБОРКА ОСТАНОВЛЕНА: вариант ответа дословно повторяет вопрос"; exit 1; }
 
+# Гейт короткого пути: у каждой способности, которую спросит короткая оценка, есть вопрос.
+python3 - "$repo" <<'PY' || exit 1
+import json, re, sys
+from pathlib import Path
+repo = Path(sys.argv[1])
+rubric = (repo / "rubric" / "aist-pos-rubric.yaml").read_text(encoding="utf-8")
+caps = set(re.findall(r"^  - id: (\w+)$", rubric, flags=re.M)) & set(
+    re.findall(r"\n  - id: (\w+)\n    cluster: ", "\n" + rubric))
+jobs = json.loads((repo / "rubric" / "job-sets.json").read_text(encoding="utf-8"))
+quick = json.loads((repo / "rubric" / "quickstart.json").read_text(encoding="utf-8"))
+hyg = set(jobs["hygiene"]["caps"])
+q = quick["questions"]
+bad = []
+for cap in q:
+    if cap not in caps:
+        bad.append("вопрос написан для неизвестной способности %s" % cap)
+    lv = [o["level"] for o in q[cap]["options"]]
+    if lv != sorted(lv) or not lv:
+        bad.append("%s: варианты идут не снизу вверх" % cap)
+    if any(not 1 <= l <= 5 for l in lv):
+        bad.append("%s: уровень варианта вне диапазона 1–5" % cap)
+    if not q[cap].get("ask"):
+        bad.append("%s: нет текста вопроса" % cap)
+# состав пути считается из каталога: у каждой способности пути должен быть вопрос
+for g in jobs["groups"]:
+    need = set()
+    for j in jobs["jobs"]:
+        if j["group"] == g["id"]:
+            need |= set(j["needs"])
+    for cap in sorted(need - hyg):
+        if cap not in q:
+            bad.append("путь «%s» спросит %s, а вопроса для неё нет" % (g["title"], cap))
+for item in quick["hygiene"]["items"]:
+    if item["cap"] not in hyg:
+        bad.append("в вопросе про опору способность %s, которой нет в hygiene" % item["cap"])
+if len(quick["hygiene"]["items"]) != len(hyg):
+    bad.append("вопрос про опору покрывает %d способностей из %d"
+               % (len(quick["hygiene"]["items"]), len(hyg)))
+if bad:
+    print("СБОРКА ОСТАНОВЛЕНА: короткая оценка разошлась с каталогом")
+    for b in bad:
+        print("  ·", b)
+    sys.exit(1)
+paths = []
+for g in jobs["groups"]:
+    need = set()
+    for j in jobs["jobs"]:
+        if j["group"] == g["id"]:
+            need |= set(j["needs"])
+    paths.append("%d" % (len(need - hyg) + 1))
+print("гейт: короткая оценка — вопросов по путям: %s (с вопросом про опору)" % ", ".join(paths))
+PY
+
 # Гейт ярусов: вторая ось задачи и опора доезжают до страницы, а не остаются в данных.
 python3 "$repo/scripts/audit/check-tiers-page.py" || {
   echo "СБОРКА ОСТАНОВЛЕНА: ярусы не дошли до пользователя"; exit 1; }
