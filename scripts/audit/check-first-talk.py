@@ -51,12 +51,9 @@ def main():
         for i, o in enumerate(opts, 1):
             if not o.get("t"):
                 bad.append("%s: у варианта %d нет текста" % (jid, i))
-            sh = o.get("short") or ""
-            if not sh:
-                bad.append("%s: у варианта %d нет короткого ярлыка для формы" % (jid, i))
-            elif len(sh) > 24:
-                bad.append("%s: ярлык варианта %d длиннее 24 знаков — форма его срежет"
-                           % (jid, i))
+            if "short" in o:
+                bad.append("%s: у варианта %d есть сокращённый ярлык — человек не должен видеть "
+                           "сокращённых формулировок, в форму идёт «Вариант А/Б/В/Г»" % (jid, i))
             for cap, lvl in (o.get("sets") or {}).items():
                 if cap not in caps:
                     bad.append("%s: вариант %d ставит уровень неизвестной способности %s"
