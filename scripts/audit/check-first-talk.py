@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """Гейт: первый разговор согласован с каталогом задач и рубрикой.
 
-Проверяет, что вопросы, привязанные к шагам задачи, ведут в ту же матрицу:
-  · вопрос написан для существующей способности, варианты идут снизу вверх, уровни в 1–5;
-  · шаги задачи существуют, и каждый вопрос привязан к существующему шагу;
-  · спрашиваем ровно то, что задаче нужно для запуска, — ни лишнего, ни недостающего.
+Первый разговор спрашивает про рабочие задачи, а не про способности, и из каждого ответа
+вынимает сразу несколько уровней. Гейт следит, чтобы эта вытяжка не разошлась с матрицей:
+
+  · вопрос привязан к существующей задаче каталога;
+  · способности, которые ставит вариант ответа, существуют в рубрике;
+  · набор способностей вопроса совпадает с порогом входа его задачи — ни лишних, ни забытых;
+  · по каждой способности уровни по вариантам не убывают, и все лежат в 1–5;
+  · шесть вопросов вместе покрывают все способности, стоящие в пороге входа хотя бы одной задачи.
 
     python3 scripts/audit/check-first-talk.py [корень репозитория]
 """
@@ -23,49 +27,67 @@ def main():
     caps = set(re.findall(r"\n  - id: (\w+)\n    cluster: ", "\n" + rubric))
     jobs = json.loads((ROOT / "rubric" / "job-sets.json").read_text(encoding="utf-8"))
     quick = json.loads((ROOT / "rubric" / "quickstart.json").read_text(encoding="utf-8"))
-    steps = json.loads((ROOT / "rubric" / "task-steps.json").read_text(encoding="utf-8"))
     byid = {j["id"]: j for j in jobs["jobs"]}
-    q = quick["questions"]
+    entry_caps = {c for j in jobs["jobs"] for c in j["needs"]}
     bad = []
+    measured = set()
 
-    for cap in q:
-        if cap not in caps:
-            bad.append("вопрос написан для неизвестной способности %s" % cap)
-        lv = [o["level"] for o in q[cap]["options"]]
-        if not lv or lv != sorted(lv) or any(not 1 <= l <= 5 for l in lv):
-            bad.append("%s: варианты идут не снизу вверх или уровень вне 1–5" % cap)
-        if not q[cap].get("ask"):
-            bad.append("%s: нет текста вопроса" % cap)
+    if not quick.get("conflict_rule"):
+        bad.append("не записано правило на случай, когда ответы про одну способность разошлись")
 
-    for tid, t in steps["tasks"].items():
-        if tid not in byid:
-            bad.append("шаги написаны для задачи %s, которой нет в каталоге" % tid)
+    for q in quick["questions"]:
+        jid = q.get("job")
+        if jid not in byid:
+            bad.append("вопрос привязан к задаче %s, которой нет в каталоге" % jid)
             continue
-        need = set(byid[tid]["needs"])
-        asked = set()
-        for a in t["asks"]:
-            if not 1 <= a["step"] <= len(t["steps"]):
-                bad.append("%s: вопрос привязан к шагу %s, а шагов %d"
-                           % (tid, a["step"], len(t["steps"])))
-            if a["cap"] not in q:
-                bad.append("%s: для способности %s нет вариантов ответа" % (tid, a["cap"]))
-            if a["cap"] not in need:
-                bad.append("%s: спрашиваем про %s, а для запуска задаче она не нужна"
-                           % (tid, a["cap"]))
-            if not a.get("ask"):
-                bad.append("%s: у вопроса к шагу %s нет текста" % (tid, a["step"]))
-            asked.add(a["cap"])
-        if need - asked:
-            bad.append("%s: задаче нужны %s, а вопросов про них нет"
-                       % (tid, ", ".join(sorted(need - asked))))
+        if not q.get("ask"):
+            bad.append("%s: нет текста вопроса" % jid)
+        opts = q.get("options") or []
+        if len(opts) < 2:
+            bad.append("%s: вариантов ответа меньше двух" % jid)
+        seen = {}
+        for i, o in enumerate(opts, 1):
+            if not o.get("t"):
+                bad.append("%s: у варианта %d нет текста" % (jid, i))
+            for cap, lvl in (o.get("sets") or {}).items():
+                if cap not in caps:
+                    bad.append("%s: вариант %d ставит уровень неизвестной способности %s"
+                               % (jid, i, cap))
+                    continue
+                if not isinstance(lvl, int) or not 1 <= lvl <= 5:
+                    bad.append("%s: вариант %d ставит %s уровень %r вне 1–5" % (jid, i, cap, lvl))
+                if cap in seen and lvl < seen[cap]:
+                    bad.append("%s: у способности %s уровень падает от варианта %d к %d — "
+                               "варианты должны идти снизу вверх" % (jid, cap, i - 1, i))
+                seen[cap] = lvl
+                measured.add(cap)
+        need = set(byid[jid]["needs"])
+        extra = set(seen) - need
+        missing = need - set(seen)
+        if extra:
+            bad.append("%s: вопрос ставит уровни способностям, которых задаче для запуска "
+                       "не нужно: %s" % (jid, ", ".join(sorted(extra))))
+        if missing:
+            bad.append("%s: задаче нужны %s, а варианты ответа их не ставят"
+                       % (jid, ", ".join(sorted(missing))))
+
+    uncovered = entry_caps - measured
+    if uncovered:
+        bad.append("вопросы не меряют способности, нужные другим задачам: %s"
+                   % ", ".join(sorted(uncovered)))
 
     if bad:
         print("первый разговор разошёлся с каталогом:")
         for b in bad:
             print("  ·", b)
         sys.exit(1)
-    print("гейт: первый разговор — задач по шагам %d, вопросов %d, все ведут в матрицу"
-          % (len(steps["tasks"]), sum(len(t["asks"]) for t in steps["tasks"].values())))
+
+    n_once = sum(1 for c in measured
+                 if sum(1 for q in quick["questions"]
+                        if c in {k for o in q["options"] for k in (o.get("sets") or {})}) == 1)
+    print("гейт: первый разговор — вопросов %d, меряют способностей %d из %d порога входа "
+          "(без перепроверки: %d)"
+          % (len(quick["questions"]), len(measured), len(entry_caps), n_once))
 
 
 if __name__ == "__main__":
