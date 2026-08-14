@@ -1,8 +1,9 @@
 # headline-стадия (гибрид): мотивирующий заголовок по среднему + честный флаг слабого звена.
 # cluster_avg = mean(cap levels в кластере).
-# headline_score = mean(cluster_avg по всем кластерам); headline_stage = round(headline_score) (к ближайшему).
+# headline_score = mean(cluster_avg по всем кластерам); headline_stage = round(headline_score) (к ближайшему,
+# ровно посередине — вниз: заголовок не завышает то, что человек ещё не собрал).
 # weak_link = кластер с минимальным cluster_avg — показывается отдельной строкой «слабое звено», НЕ занижает заголовок.
-stage_rule: "round(mean(cluster_avg))"
+stage_rule: "round(mean(cluster_avg)), половина — вниз"
 weak_link_rule: "argmin(cluster_avg)"
 # Заголовок стадии человек видит первой строкой выдачи, и на короткой оценке первую-вторую
 # стадию собирает большинство. Прежнее имя первой стадии читалось как приговор, а не как
