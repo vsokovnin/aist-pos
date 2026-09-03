@@ -93,6 +93,10 @@ for b in re.split(r"\n  - id: ", "\n" + rubric)[1:]:
         r"      (to_L[345]):\n        do: \".*?\"\n        how: \".*?\"\n        done_when: \".*?\"\n", b))
     if "to_L3" not in steps:
         holes.append("%s: нет рецепта на третий уровень (do, how, done_when)" % cap)
+    # человеческая расшифровка способности: ею страница говорит, чего задаче не хватает.
+    # Нет её — в карточку уезжает внутренний ярлык с номером уровня, набор слов.
+    if '\n    need: "' not in b:
+        holes.append("%s: нет поля need — короткой человеческой формулировки" % cap)
     if cap in need4 and "to_L4" not in steps:
         holes.append("%s: задача требует четвёртого уровня, рецепта перехода нет" % cap)
 if holes:
