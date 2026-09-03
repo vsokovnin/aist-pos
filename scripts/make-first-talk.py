@@ -18,8 +18,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-UI_FIELDS = ["kicker", "read", "title", "intro", "jobsTitle", "jobsLead", "qTitle", "qLead",
-             "skip", "count", "button", "outTitle", "outText", "copyOk", "copyFail"]
+UI_FIELDS = ["kicker", "read", "title", "intro", "skip", "count", "button",
+             "outTitle", "outText", "copyOk", "copyFail"]
+# страница — только опросник: каталог задач, объяснения и любая витрина живут в плейбуке
+FOREIGN = ["jobsTitle", "jobsLead", "qTitle", "qLead", "groups", "jobs"]
 # вёрстка, которая прячет часть текста: ровно то, из-за чего страница и появилась
 CUTTERS = ["text-overflow", "line-clamp", "white-space:nowrap", "white-space: nowrap"]
 
@@ -51,23 +53,12 @@ def build(out_path):
     if not questions:
         fail("в rubric/quickstart.json нет вопросов")
 
-    # каталог задач едет на ту же страницу: в чате его печатать нечем и незачем
-    jobs_path = ROOT / "rubric" / "job-sets.json"
-    if not jobs_path.exists():
-        fail("не найден " + str(jobs_path))
-    cat = json.loads(jobs_path.read_text(encoding="utf-8"))
-    groups = [{"id": g["id"], "title": g["title"], "note": g["note"]} for g in cat["groups"]]
-    jobs = [{"group": j["group"], "title": j["title"], "promise": j["promise"]} for j in cat["jobs"]]
-    gids = {g["id"] for g in groups}
-    orphan = sorted({j["group"] for j in jobs} - gids)
-    if orphan:
-        fail("задачи ссылаются на группы, которых нет: " + ", ".join(orphan))
-    empty = [g["id"] for g in groups if not any(j["group"] == g["id"] for j in jobs)]
-    if empty:
-        fail("на странице будет пустая группа задач: " + ", ".join(empty))
+    intruder = [f for f in FOREIGN if page.get(f)]
+    if intruder:
+        fail("на странице первого разговора только вопросы; уберите из текстов страницы: "
+             + ", ".join(intruder))
 
-    payload = {"ui": {f: page[f] for f in UI_FIELDS},
-               "groups": groups, "jobs": jobs, "questions": []}
+    payload = {"ui": {f: page[f] for f in UI_FIELDS}, "questions": []}
     for q in questions:
         if not q.get("id") or not q.get("ask") or not q.get("options"):
             fail("у вопроса %s нет идентификатора, текста или вариантов" % q.get("id"))
@@ -105,9 +96,6 @@ def build(out_path):
     # главная проверка: каждая формулировка доехала до страницы целиком и дословно
     def onpage(s):
         return json.dumps(s, ensure_ascii=False)[1:-1] in html
-    for j in jobs:
-        if not onpage(j["title"]) or not onpage(j["promise"]):
-            fail("задача каталога «%s» не попала на страницу целиком" % j["title"])
     for q in questions:
         if not onpage(q["ask"]):
             fail("вопрос %s не попал на страницу целиком" % q["id"])
