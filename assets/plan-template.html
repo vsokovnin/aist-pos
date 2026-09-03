@@ -346,7 +346,12 @@ footer{padding:34px 0 56px;font-size:11px;text-transform:uppercase;
 .ready.wide .rbar{max-width:320px}
 .rbar i{position:absolute;left:0;top:0;height:8px;border-radius:4px;background:var(--primary)}
 .rnum{font-family:var(--font-mono);font-size:12px;color:var(--muted-foreground)}
-.miss{display:block;font-size:12.5px;color:var(--subtle);margin-top:8px;line-height:1.4}
+.miss{display:block;font-size:13px;color:var(--muted-foreground);margin-top:10px;line-height:1.45}
+.miss b{font-weight:500;color:var(--foreground)}
+.needs{display:block;margin-top:5px}
+.needs span{display:block;padding-left:13px;position:relative;margin-top:3px}
+.needs span::before{content:"";position:absolute;left:2px;top:8px;width:4px;height:4px;
+  border-radius:50%;background:var(--primary)}
 .jsel{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card);
   padding:22px 24px 18px}
 .jsel .label{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;
@@ -1079,6 +1084,17 @@ const avg = (id, key) => {
 const capLevel = id => (capById(id) || { levelNow: 0 }).levelNow;
 const capTitle = id => (capById(id) || {}).title || CAP_TITLES[id] || id;
 const capShort = id => (capById(id) || {}).short || capTitle(id);
+/* человеческая формулировка способности: ею страница объясняет, чего не хватает */
+const capNeed = id => ((RECIPES[id] || {}).need) || capTitle(id).toLowerCase();
+const NUMW = ["", "одно", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять",
+              "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать",
+              "шестнадцать", "семнадцать", "восемнадцать"];
+const numWord = n => {
+  const d = n % 10;
+  const form = (n >= 11 && n <= 14) ? "условий"
+    : d === 1 ? "условие" : (d >= 2 && d <= 4) ? "условия" : "условий";
+  return (NUMW[n] || String(n)) + " " + form;
+};
 const jobById = id => JOBS.find(j => j.id === id);
 const jobEntries = j => Object.keys(j.needs).map(c => [c, j.needs[c]]);
 /* вторая ось задачи: что снимает эпизодические срывы, когда задача уже заработала */
@@ -1225,16 +1241,19 @@ function jobCard(j, nearId){
   const total = jobEntries(j).length, done = jobDone(j), gaps = jobGaps(j);
   /* «ближе всего» — ровно одна задача: превосходная степень на двух карточках не работает */
   const near = j.id === nearId;
+  /* говорим человеческой фразой из рубрики, а не ярлыком с номером уровня:
+     «агент доводит задачу до конца сам», а не «сам до конца до 3» */
   const miss = gaps.length
-    ? "Не хватает: " + gaps.map(e => capShort(e[0]).toLowerCase() + " до " + e[1]).join(", ")
-    : "Всё на нужном уровне";
+    ? '<b>Чтобы заработало, нужно:</b><span class="needs">' +
+      gaps.map(e => "<span>" + esc(capNeed(e[0])) + "</span>").join("") + "</span>"
+    : "<b>Всё на месте — задача заработает.</b>";
   const hgaps = hardGaps(j), hlist = hardEntries(j);
   const nextLine = !hlist.length ? ""
     : hgaps.length
-      ? "дальше, чтобы не подводило: не хватает " +
-        hgaps.slice(0, 3).map(e => capShort(e[0]).toLowerCase()).join(", ") +
-        (hgaps.length > 3 ? " и ещё " + (hgaps.length - 3) : "")
-      : "не подводит: всё на уровне";
+      ? (gaps.length ? "Дальше, чтобы не подводило, " : "Чтобы не подводило, ") +
+        "понадобится ещё " + numWord(hgaps.length) + " — " + (gaps.length ? "они" : "это") +
+        " в разборе задачи ниже."
+      : "Не подводит: и здесь всё на месте.";
   return '<button class="jcard' + (near ? " near" : "") + (gaps.length ? "" : " done") +
     (j.id === chosen ? " cur" : "") + '" data-job="' + j.id + '">' +
     '<span class="jhead"><span class="ico">' + icon(j.icon) + "</span><b>" + esc(j.title) + "</b>" +
@@ -1244,7 +1263,7 @@ function jobCard(j, nearId){
     '</span><span class="jshort">' + esc(j.short) + "</span>" +
     '<span class="ready"><span class="rbar"><i style="width:' + (done / total * 100) +
     '%"></i></span><span class="rnum">' + done + " из " + total + "</span></span>" +
-    '<span class="miss">' + esc(miss) + "</span>" +
+    '<span class="miss">' + miss + "</span>" +
     (nextLine ? '<span class="nextline">' + esc(nextLine) + "</span>" : "") + "</button>";
 }
 
