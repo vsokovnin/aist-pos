@@ -164,6 +164,11 @@ python3 "$repo/scripts/make-first-talk.py" "$repo/first-talk.html" >/dev/null ||
   echo "СБОРКА ОСТАНОВЛЕНА: не собралась страница первого разговора"; exit 1; }
 echo "гейт: страница первого разговора собрана"
 
+# Оценка одной страницей: тот же расчёт, но без навыка и без чата — на случай показа и раздачи.
+python3 "$repo/scripts/make-standalone.py" "$repo/assessment.html" >/dev/null || {
+  echo "СБОРКА ОСТАНОВЛЕНА: не собралась оценка одной страницей"; exit 1; }
+echo "гейт: оценка одной страницей собрана"
+
 mkdir -p "$dist" "$stage/$name"
 
 # В архив идёт только содержимое навыка: ни .git, ни личных данных, ни артефактов сборки.
@@ -175,6 +180,7 @@ README.md
 LICENSE
 playbook.html
 first-talk.html
+assessment.html
 workflows
 rubric
 templates

@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Зрелость личной операционной системы — оценка</title>
+<style>
+:root{
+  --background:#FAFAFA; --card:#FFFFFF; --secondary:#F5F5F7;
+  --foreground:#111111; --muted-foreground:#595959; --subtle:#8A8A8E;
+  --border:#E0E0E0;
+  --primary:#0048B2; --primary-deep:#003484; --primary-soft:rgba(0,72,178,.06);
+  --success-deep:#0f7a37; --base:#C2410C;
+  --font-display:"Commissioner",ui-sans-serif,system-ui,sans-serif;
+  --font-body:"Inter",ui-sans-serif,system-ui,sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --r:10px; --rl:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--background);color:var(--foreground);
+  font:17px/1.62 var(--font-body);letter-spacing:-.003em}
+.wrap{max-width:1060px;margin:0 auto;padding:44px 24px 140px}
+.kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--primary)}
+.addr{display:flex;justify-content:space-between;align-items:baseline;gap:20px;
+  border-bottom:1px solid var(--border);padding-bottom:12px}
+.addr .mute{color:var(--subtle)}
+h1{font-family:var(--font-display);font-size:34px;line-height:1.16;font-weight:600;margin:16px 0 0}
+h2{font-family:var(--font-display);font-size:23px;font-weight:600;margin:44px 0 8px}
+.intro{margin:14px 0 0;color:var(--muted-foreground);font-size:16.5px;max-width:74ch}
+.lead{margin:0 0 20px;color:var(--muted-foreground);font-size:16px;max-width:74ch}
+[hidden]{display:none !important}
+
+/* опрос */
+.q{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);
+  padding:24px 26px 20px;margin-top:22px}
+.q.done{border-color:#C7D6EC}
+.qhead{display:flex;gap:14px;align-items:baseline}
+.qnum{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;color:var(--subtle);flex:none;padding-top:4px}
+.q h3{font-family:var(--font-display);font-size:21px;line-height:1.34;font-weight:600;margin:0}
+.opt{display:flex;gap:15px;align-items:flex-start;width:100%;text-align:left;margin-top:9px;
+  background:var(--secondary);border:1px solid transparent;border-radius:var(--r);
+  padding:14px 16px;cursor:pointer;font:inherit;color:inherit;transition:border-color .12s,background .12s}
+.opt:hover{border-color:#C7D6EC}
+.opt .ltr{flex:none;width:26px;height:26px;border-radius:50%;background:var(--card);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-size:13.5px;font-weight:600;color:var(--muted-foreground)}
+.opt .txt{flex:1;font-size:16px;line-height:1.5}
+.opt.on{background:var(--primary-soft);border-color:var(--primary)}
+.opt.on .ltr{background:var(--primary);border-color:var(--primary);color:#fff}
+.skip{background:none;padding:12px 16px;margin-top:6px}
+.skip .txt{color:var(--subtle);font-size:14.5px}
+.skip.on{background:var(--secondary);border-color:var(--border)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(250,250,250,.94);
+  backdrop-filter:blur(8px);border-top:1px solid var(--border);z-index:5}
+.barin{max-width:1060px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;
+  justify-content:space-between;gap:18px}
+.count{font-size:15px;color:var(--muted-foreground)}
+.count b{font-weight:500;color:var(--foreground)}
+.btn{font:inherit;font-size:16px;font-weight:500;background:var(--primary);color:#fff;border:none;
+  border-radius:var(--r);padding:12px 22px;cursor:pointer}
+.btn:disabled{background:var(--border);color:var(--subtle);cursor:default}
+.btn:hover:not(:disabled){background:var(--primary-deep)}
+.btn.ghost{background:none;color:var(--primary);border:1px solid var(--border)}
+.btn.ghost:hover{background:var(--secondary)}
+
+/* результат */
+.scan{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,1fr);gap:24px;align-items:start}
+.plot{border:1px solid var(--border);border-radius:var(--rl);background:var(--card);
+  padding:16px 8px 12px 14px;min-width:0}
+.plot svg{width:100%;height:auto;display:block}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);
+  border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tile{background:var(--card);padding:15px 17px}
+.tile b{font-family:var(--font-display);font-size:30px;font-weight:600;line-height:1;display:block}
+.tile b i{font-style:normal;font-size:15px;font-weight:400;color:var(--subtle);margin-left:4px}
+.tile span{display:block;font-family:var(--font-mono);font-size:10px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--subtle);margin-top:9px;line-height:1.4}
+.tile p{margin:5px 0 0;font-size:13.5px;line-height:1.45;color:var(--muted-foreground)}
+.dirs{margin-top:16px;border-top:1px solid var(--border)}
+.dir{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.dir .dot{width:9px;height:9px;border-radius:3px;flex:none}
+.dir .nm{flex:1;font-size:13.5px;line-height:1.3;min-width:0}
+.dir .barx{width:92px;height:6px;border-radius:3px;background:var(--secondary);flex:none;position:relative}
+.dir .barx i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.dir .barx u{position:absolute;top:-3px;bottom:-3px;width:1.5px;background:var(--base);opacity:.6}
+.dir .vl{width:26px;text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--muted-foreground);flex:none}
+.rleg{margin-top:14px;font-size:12.5px;line-height:1.65;color:var(--subtle)}
+.rleg b{font-weight:500;color:var(--muted-foreground)}
+
+.step{border:1px solid var(--primary);border-radius:var(--rl);background:var(--card);overflow:hidden;margin-top:8px}
+.step .sh{padding:20px 24px 16px}
+.step .sh .k{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--primary)}
+.step .sh h3{font-family:var(--font-display);font-size:22px;font-weight:600;margin:8px 0 6px}
+.step .sh p{margin:0;color:var(--muted-foreground);font-size:15.5px}
+.step .ask{border-top:1px solid var(--border);background:var(--secondary);padding:16px 24px}
+.step .ask .k{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--subtle)}
+.step .ask blockquote{margin:8px 0 12px;font-size:16px;line-height:1.55;border-left:2px solid var(--primary);padding-left:14px}
+.step .done{border-top:1px solid var(--border);padding:13px 24px;font-size:14.5px;color:var(--muted-foreground)}
+.step .done b{font-weight:500;color:var(--foreground)}
+
+.jgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.jc{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:18px 20px}
+.jc.ready{border-color:#BFE0C9;background:#F7FCF8}
+.jc b{font-family:var(--font-display);font-size:17px;font-weight:600;line-height:1.3;display:block}
+.jc .pr{margin:5px 0 0;font-size:13.5px;color:var(--muted-foreground);line-height:1.45}
+.jc .st{margin-top:11px;font-size:13px;line-height:1.45;color:var(--muted-foreground)}
+.jc .st u{display:block;text-decoration:none;font-weight:500;color:var(--foreground)}
+.jc .st span{display:block;padding-left:13px;position:relative;margin-top:3px}
+.jc .st span::before{content:"";position:absolute;left:2px;top:8px;width:4px;height:4px;border-radius:50%;background:var(--primary)}
+.jc.ready .st u{color:var(--success-deep)}
+.gh{display:flex;align-items:baseline;gap:12px;margin:26px 0 12px}
+.gh h3{font-family:var(--font-display);font-size:17px;font-weight:600;margin:0}
+.gh span{font-size:13.5px;color:var(--subtle)}
+
+.keep{margin-top:16px;border:1px solid var(--border);border-radius:var(--rl);background:var(--card);padding:20px 24px}
+.keep .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:12px}
+textarea{width:100%;min-height:82px;font-family:var(--font-mono);font-size:12px;line-height:1.5;
+  border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;background:var(--secondary);
+  color:var(--foreground);resize:vertical}
+pre{margin:12px 0 0;padding:14px 16px;background:var(--secondary);border-radius:var(--r);
+  font-family:var(--font-mono);font-size:12px;line-height:1.55;overflow-x:auto;white-space:pre;user-select:all}
+.state{margin:10px 0 0;font-size:14px;color:var(--success-deep)}
+.state.warn{color:#8a5a00}
+.delta{margin-top:14px;border-top:1px solid var(--border);padding-top:14px;font-size:15px}
+.delta li{margin:5px 0;color:var(--muted-foreground)}
+.delta li b{color:var(--foreground);font-weight:500}
+footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--border);
+  font-family:var(--font-mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--subtle)}
+@media(max-width:900px){.scan{grid-template-columns:1fr}.jgrid{grid-template-columns:1fr}}
+@media(max-width:640px){.wrap{padding:32px 16px 150px}h1{font-size:27px}.q{padding:20px 18px 16px}
+  .qhead{display:block}.qnum{display:block;margin-bottom:6px}.q h3{font-size:19px}
+  .barin{padding:12px 16px}.btn{flex:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="addr">
+    <span class="kicker" id="headKicker"></span>
+    <span class="kicker mute" id="headRead"></span>
+  </div>
+  <h1 id="title"></h1>
+  <p class="intro" id="intro"></p>
+
+  <div id="quiz">
+    <div id="questions"></div>
+  </div>
+
+  <div id="result" hidden></div>
+
+  <footer id="foot"></footer>
+</div>
+
+<div class="bar" id="bar">
+  <div class="barin">
+    <span class="count" id="count"></span>
+    <button class="btn" id="go" disabled></button>
+  </div>
+</div>
+
+<script>
+/* DATA */
+const D = {};
+/* конец DATA */
+
+const LETTERS = ["А", "Б", "В", "Г", "Д", "Е"];
+const BASE = 3, MAX = 5;
+const DIRC = {context:"#0048B2", files:"#0E7C86", capture:"#6B5BD2",
+              work:"#B45309", knowledge:"#0F7A37"};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
+const NUMW = ["", "одна", "две", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять",
+              "десять", "одиннадцать", "двенадцать", "тринадцать"];
+const plural = (n, one, few, many) => {
+  const d = n % 10;
+  const form = (n >= 11 && n <= 14) ? many : d === 1 ? one : (d >= 2 && d <= 4) ? few : many;
+  return (NUMW[n] || String(n)) + " " + form;
+};
+const capById = id => D.caps.find(c => c.id === id) || {};
+const picked = {};
+
+$("#headKicker").textContent = D.ui.kicker;
+$("#headRead").textContent = D.ui.read;
+$("#title").textContent = D.ui.title;
+$("#intro").textContent = D.ui.intro;
+$("#go").textContent = D.ui.button;
+$("#foot").textContent = "AIST POS · " + D.version + " · оценка зрелости личной операционной системы";
+
+$("#questions").innerHTML = D.questions.map((q, qi) =>
+  '<section class="q" id="q' + qi + '"><div class="qhead"><span class="qnum">' +
+    (qi + 1) + " / " + D.questions.length + '</span><h3>' + esc(q.ask) + "</h3></div><div>" +
+    q.options.map((o, oi) =>
+      '<button type="button" class="opt" data-q="' + qi + '" data-o="' + oi + '">' +
+      '<span class="ltr">' + LETTERS[oi] + '</span><span class="txt">' + esc(o.t) + "</span></button>").join("") +
+    '<button type="button" class="opt skip" data-q="' + qi + '" data-o="-1">' +
+    '<span class="ltr">—</span><span class="txt">' + esc(D.ui.skip) + "</span></button></div></section>").join("");
+
+document.addEventListener("click", e => {
+  const b = e.target.closest(".opt");
+  if (!b) return;
+  const qi = +b.dataset.q, oi = +b.dataset.o;
+  picked[qi] = oi;
+  const sec = $("#q" + qi);
+  sec.classList.add("done");
+  sec.querySelectorAll(".opt").forEach(x => x.classList.toggle("on", +x.dataset.o === oi));
+  refresh();
+});
+
+function refresh() {
+  const n = D.questions.filter((q, i) => i in picked).length;
+  $("#count").innerHTML = esc(D.ui.count) + " <b>" + n + " / " + D.questions.length + "</b>";
+  $("#go").disabled = n === 0;
+}
+refresh();
+
+/* ——— расчёт ——— */
+
+/* уровень ставится по ответу; одна способность в нескольких вопросах — берём нижний */
+function levelsFrom(answers) {
+  const lv = {};
+  D.questions.forEach((q, i) => {
+    const oi = answers[q.id];
+    if (oi === null || oi === undefined || oi < 0) return;
+    const sets = q.options[oi].sets;
+    for (const cap in sets) lv[cap] = Math.min(lv[cap] === undefined ? 9 : lv[cap], sets[cap]);
+  });
+  const measured = Object.keys(lv);
+  /* не измеренное выводим правилом и помечаем предположением, а не выдаём за факт */
+  const guess = avg(measured.map(c => lv[c])) < BASE ? 2 : 3;
+  const assumed = D.caps.map(c => c.id).filter(id => !(id in lv));
+  assumed.forEach(id => { lv[id] = guess; });
+  return {lv, assumed};
+}
+
+function stageOf(lv) {
+  const cl = D.clusters.map(d => avg(D.caps.filter(c => c.dir === d.id).map(c => lv[c.id])));
+  const score = avg(cl);
+  /* ровно посередине — вниз: заголовок не завышает то, что не собрано */
+  const n = Math.max(1, Math.min(5, score - Math.floor(score) > 0.5 ? Math.ceil(score) : Math.floor(score)));
+  return {n: n, score: score, st: D.stages[n], clusters: cl};
+}
+
+const gapsOf = (j, lv) => Object.keys(j.needs).filter(c => lv[c] < j.needs[c])
+  .map(c => [c, j.needs[c]]);
+const readyOf = (j, lv) => gapsOf(j, lv).length === 0;
+const stepsOf = (j, lv) => gapsOf(j, lv).reduce((s, e) => s + (e[1] - lv[e[0]]), 0);
+
+/* первый шаг — не самая слабая способность, а та, что открывает больше всего задач сразу */
+function firstStep(lv) {
+  const need = {};
+  D.jobs.forEach(j => Object.keys(j.needs).forEach(c => {
+    if (lv[c] < j.needs[c]) need[c] = Math.max(need[c] || 0, j.needs[c]);
+  }));
+  const ids = Object.keys(need);
+  if (!ids.length) return null;
+  let best = null;
+  ids.forEach(c => {
+    const test = Object.assign({}, lv);
+    test[c] = need[c];
+    const opens = D.jobs.filter(j => !readyOf(j, lv) && readyOf(j, test)).length;
+    const gap = need[c] - lv[c];
+    if (!best || opens > best.opens || (opens === best.opens && gap > best.gap))
+      best = {cap: c, opens: opens, gap: gap, to: need[c]};
+  });
+  return best;
+}
+
+/* ——— отрисовка ——— */
+
+function radar(lv, assumed) {
+  const CX = 390, CY = 300, R = 196;
+  const order = D.clusters.map(d => d.id);
+  const caps = D.caps.slice().sort((a, b) => order.indexOf(a.dir) - order.indexOf(b.dir));
+  const N = caps.length;
+  const ang = i => (-90 + i * 360 / N) * Math.PI / 180;
+  const pt = (i, v) => [CX + Math.cos(ang(i)) * R * v / MAX, CY + Math.sin(ang(i)) * R * v / MAX];
+  const ring = v => caps.map((c, i) => pt(i, v).join(",")).join(" ");
+  const col = d => DIRC[d] || "#0048B2";
+  let s = "", start = 0;
+  D.clusters.forEach(d => {
+    const n = caps.filter(c => c.dir === d.id).length;
+    if (!n) return;
+    const a0 = ang(start) - Math.PI / N, a1 = ang(start + n - 1) + Math.PI / N;
+    const big = (a1 - a0) > Math.PI ? 1 : 0, RB = R + 9;
+    s += '<path d="M' + CX + ' ' + CY + ' L' + (CX + Math.cos(a0) * R) + ' ' + (CY + Math.sin(a0) * R) +
+      ' A' + R + ' ' + R + ' 0 ' + big + ' 1 ' + (CX + Math.cos(a1) * R) + ' ' + (CY + Math.sin(a1) * R) +
+      ' Z" fill="' + col(d.id) + '" opacity=".06"/>' +
+      '<path d="M' + (CX + Math.cos(a0) * RB) + ' ' + (CY + Math.sin(a0) * RB) + ' A' + RB + ' ' + RB +
+      ' 0 ' + big + ' 1 ' + (CX + Math.cos(a1) * RB) + ' ' + (CY + Math.sin(a1) * RB) +
+      '" fill="none" stroke="' + col(d.id) + '" stroke-width="3" opacity=".75" stroke-linecap="round"/>';
+    start += n;
+  });
+  for (let v = 1; v <= MAX; v++)
+    s += '<polygon points="' + ring(v) + '" fill="none" stroke="#DCDCE0" stroke-width="1"/>';
+  s += '<polygon points="' + ring(BASE) + '" fill="none" stroke="var(--base)" stroke-width="1.6" stroke-dasharray="5 5" opacity=".85"/>';
+  caps.forEach((c, i) => {
+    const p = pt(i, MAX);
+    s += '<line x1="' + CX + '" y1="' + CY + '" x2="' + p[0] + '" y2="' + p[1] + '" stroke="#E6E6EA" stroke-width="1"/>';
+  });
+  s += '<polygon points="' + caps.map((c, i) => pt(i, lv[c.id]).join(",")).join(" ") +
+    '" fill="var(--primary)" fill-opacity=".13" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round"/>';
+  caps.forEach((c, i) => {
+    const p = pt(i, lv[c.id]), a = ang(i), isA = assumed.indexOf(c.id) >= 0;
+    s += isA
+      ? '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4.6" fill="#fff" stroke="var(--primary)" stroke-width="2"/>'
+      : '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4" fill="var(--primary)"/>';
+    const lx = CX + Math.cos(a) * (R + 22), ly = CY + Math.sin(a) * (R + 22), cs = Math.cos(a);
+    const anchor = Math.abs(cs) < 0.18 ? "middle" : (cs > 0 ? "start" : "end");
+    const low = lv[c.id] < BASE;
+    s += '<text x="' + lx + '" y="' + ly + '" text-anchor="' + anchor + '" dominant-baseline="middle" ' +
+      'font-family="var(--font-body)" font-size="13.5" fill="' + (low ? "#3A3A3C" : "#111") + '">' + esc(c.short) + "</text>" +
+      '<text x="' + lx + '" y="' + (ly + 15) + '" text-anchor="' + anchor + '" dominant-baseline="middle" ' +
+      'font-family="var(--font-mono)" font-size="11" fill="' + (low ? "var(--base)" : "var(--subtle)") + '">' +
+      lv[c.id] + (isA ? " ?" : "") + "</text>";
+  });
+  s += '<text x="' + (CX + 6) + '" y="' + (CY - R * BASE / MAX - 7) + '" font-family="var(--font-mono)" ' +
+    'font-size="10.5" letter-spacing="1" fill="var(--base)">БАЗОВЫЙ УРОВЕНЬ</text>';
+  return '<svg viewBox="74 56 632 500" role="img" aria-label="Уровень по каждой способности">' + s + "</svg>";
+}
+
+function jobCard(j, lv) {
+  const gaps = gapsOf(j, lv), ready = !gaps.length;
+  return '<div class="jc' + (ready ? " ready" : "") + '"><b>' + esc(j.title) + '</b>' +
+    '<p class="pr">' + esc(j.short) + '</p><div class="st">' +
+    (ready ? "<u>Уже заработает</u>"
+           : "<u>Чтобы заработало, нужно:</u>" +
+             gaps.map(e => "<span>" + esc(capById(e[0]).need) + "</span>").join("")) +
+    "</div></div>";
+}
+
+function render(answers) {
+  const r = levelsFrom(answers), lv = r.lv, assumed = r.assumed;
+  const st = stageOf(lv);
+  const ready = D.jobs.filter(j => readyOf(j, lv));
+  const open = D.jobs.filter(j => !readyOf(j, lv));
+  const near = open.length ? open.reduce((a, b) => stepsOf(b, lv) < stepsOf(a, lv) ? b : a) : null;
+  const fs = firstStep(lv);
+  const below = D.caps.filter(c => lv[c.id] < BASE).length;
+  const weak = D.clusters[st.clusters.indexOf(Math.min.apply(null, st.clusters))];
+
+  let h = '<h2>Где вы сейчас</h2><div class="scan"><div class="plot">' + radar(lv, assumed) + "</div><div>" +
+    '<div class="tiles">' + [
+      {b: st.n, i: "из 5", s: "стадия", p: st.st.name},
+      {b: st.score.toFixed(1), i: "", s: "средний уровень", p: st.st.desc},
+      {b: below, i: "из " + D.caps.length, s: "способностей ниже базовой", p: "им не хватает до третьего"},
+      {b: ready.length, i: "из " + D.jobs.length, s: "задач уже заработает", p: "остальным чего-то не хватает"},
+    ].map(t => '<div class="tile"><b>' + t.b + (t.i ? '<i>' + t.i + "</i>" : "") + "</b><span>" +
+      esc(t.s) + "</span><p>" + esc(t.p) + "</p></div>").join("") + "</div>" +
+    '<div class="dirs">' + D.clusters.map((d, i) => {
+      const v = st.clusters[i];
+      return '<div class="dir"><span class="dot" style="background:' + (DIRC[d.id] || "#0048B2") + '"></span>' +
+        '<span class="nm">' + esc(d.title.split(" — ")[0]) + '</span><span class="barx">' +
+        '<i style="width:' + (v / MAX * 100) + '%;background:' + (DIRC[d.id] || "#0048B2") + '"></i>' +
+        '<u style="left:' + (BASE / MAX * 100) + '%"></u></span><span class="vl">' + v.toFixed(1) + "</span></div>";
+    }).join("") + "</div>" +
+    '<div class="rleg"><b>Синий контур</b> — ваш уровень по каждой способности.<br>' +
+    '<b>Оранжевый пунктир</b> — базовый третий: с него способность держит задачу.' +
+    (assumed.length ? '<br><b>Полый кружок</b> — не спрашивали, уровень выведен правилом.' : "") +
+    "</div></div></div>";
+
+  h += '<h2>Слабое звено</h2><p class="lead">Ниже всего — «' + esc(weak.title.split(" — ")[0]) +
+    '», в среднем ' + Math.min.apply(null, st.clusters).toFixed(1) +
+    '. Пока это направление внизу, задачи, которые на нём стоят, не соберутся.</p>';
+
+  if (fs) {
+    const c = capById(fs.cap);
+    /* шаг ведёт туда, где он нужен: до третьего уровня — своя основа, до четвёртого — свой рецепт */
+    const rec = (fs.to >= 4 && c.to_L4) ? c.to_L4 : (c.to_L3 || {});
+    h += '<h2>Первый шаг</h2><p class="lead">Не самое слабое место вообще, а то, что открывает больше всего задач сразу.</p>' +
+      '<div class="step"><div class="sh"><div class="k">' + esc(c.title) + " · у вас " + lv[fs.cap] +
+      ", нужно " + fs.to + '</div><h3>' + esc(rec.do || c.need) + "</h3><p>" +
+      "Нужно, чтобы стало так: " + esc(c.need) + ". " +
+      (fs.opens ? "Сделаете — заработают ещё " + plural(fs.opens, "задача", "задачи", "задач") + "."
+                : "Сам по себе этот шаг задачу не откроет, но без него не сдвинется ничего.") +
+      "</p></div>" +
+      (rec.how ? '<div class="ask"><div class="k">готовый запрос — скопируйте целиком</div>' +
+        "<blockquote>" + esc(rec.how) + "</blockquote>" +
+        '<button class="btn ghost" id="copyAsk">Скопировать запрос</button>' +
+        '<p class="state" id="askState" hidden></p></div>' : "") +
+      (rec.done_when ? '<div class="done"><b>Сделано, когда:</b> ' + esc(rec.done_when) + "</div>" : "") +
+      "</div>";
+  }
+
+  if (near) {
+    h += '<h2>Ближе всего</h2><p class="lead">' + esc(near.title) + " — " + esc(near.promise) + "</p>";
+  }
+
+  h += '<h2>Все задачи</h2><p class="lead">Под каждой — чего не хватает, чтобы она заработала.</p>' +
+    D.groups.map(g => {
+      const list = D.jobs.filter(j => j.group === g.id)
+        .sort((a, b) => stepsOf(a, lv) - stepsOf(b, lv));
+      if (!list.length) return "";
+      return '<div class="gh"><h3>' + esc(g.title) + "</h3><span>" + esc(g.note) + "</span></div>" +
+        '<div class="jgrid">' + list.map(j => jobCard(j, lv)).join("") + "</div>";
+    }).join("");
+
+  const keep = {aist_pos: "assessment", version: D.version, date: new Date().toISOString().slice(0, 10),
+                stage: st.n, score: +st.score.toFixed(2), answers: answers, levels: lv};
+  h += '<h2>Сохраните результат</h2><p class="lead">Пройдёте ещё раз через месяц — вставите этот блок ' +
+    'обратно и увидите не только «где я», а что сдвинулось.</p><div class="keep">' +
+    '<button class="btn" id="copyKeep">Скопировать результат</button>' +
+    '<p class="state" id="keepState" hidden></p>' +
+    "<pre id=\"keepJson\">" + esc(JSON.stringify(keep)) + "</pre>" +
+    '<div class="row" style="margin-top:18px;display:block">' +
+    '<b style="font-weight:500">Проходите не первый раз?</b> Вставьте сюда прошлый результат:' +
+    '<textarea id="prev" placeholder="{&quot;aist_pos&quot;: &quot;assessment&quot;, ...}"></textarea>' +
+    '<button class="btn ghost" id="cmp">Показать, что сдвинулось</button>' +
+    '<div id="delta"></div></div></div>';
+
+  $("#result").innerHTML = h;
+  $("#result").hidden = false;
+  $("#quiz").hidden = true;
+  $("#bar").hidden = true;
+  window.scrollTo(0, 0);
+
+  const copy = (text, el) => {
+    const show = ok => { el.hidden = false; el.textContent = ok ? "Скопировано." : "Скопировать не вышло — выделите текст и скопируйте руками."; el.className = "state" + (ok ? "" : " warn"); };
+    if (navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(text).then(() => show(true), () => show(false));
+    else show(false);
+  };
+  const ask = $("#copyAsk");
+  if (ask) {
+    const c = capById(fs.cap);
+    const rec = (fs.to >= 4 && c.to_L4) ? c.to_L4 : c.to_L3;
+    ask.addEventListener("click", () => copy(rec.how, $("#askState")));
+  }
+  $("#copyKeep").addEventListener("click", () => copy(JSON.stringify(keep), $("#keepState")));
+  $("#cmp").addEventListener("click", () => showDelta(lv, st));
+}
+
+function showDelta(lv, st) {
+  const box = $("#delta");
+  let prev;
+  try { prev = JSON.parse($("#prev").value); } catch (e) { prev = null; }
+  if (!prev || !prev.levels) {
+    box.innerHTML = '<p class="state warn">Не разобрал блок. Вставьте его целиком, вместе с фигурными скобками.</p>';
+    return;
+  }
+  const moved = D.caps.filter(c => prev.levels[c.id] !== undefined && lv[c.id] !== prev.levels[c.id])
+    .map(c => ({c: c, from: prev.levels[c.id], to: lv[c.id]}));
+  const wasReady = D.jobs.filter(j => readyOf(j, prev.levels)).length;
+  const nowReady = D.jobs.filter(j => readyOf(j, lv)).length;
+  box.innerHTML = '<div class="delta"><p><b>Стадия:</b> была ' + prev.stage + ", стала " + st.n +
+    " · <b>задач готово:</b> было " + wasReady + ", стало " + nowReady + " · <b>прошлый замер:</b> " +
+    esc(prev.date || "дата не записана") + "</p>" +
+    (moved.length
+      ? "<ul>" + moved.map(m => "<li><b>" + esc(m.c.title) + "</b> " + m.from + " → " + m.to +
+          (m.to > m.from ? " — " + esc(m.c.need) : "") + "</li>").join("") + "</ul>"
+      : "<p>Ни одна способность не сдвинулась.</p>") + "</div>";
+}
+
+$("#go").addEventListener("click", () => {
+  const answers = {};
+  D.questions.forEach((q, i) => { answers[q.id] = (i in picked) ? picked[i] : -1; });
+  render(answers);
+});
+</script>
+</body>
+</html>
