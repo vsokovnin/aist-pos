@@ -28,6 +28,20 @@ h1{font-family:var(--font-display);font-size:34px;line-height:1.16;font-weight:6
 .intro{margin:14px 0 0;color:var(--muted-foreground);font-size:16.5px}
 .intro b{color:var(--foreground);font-weight:500}
 
+.jobs{margin-top:30px;border-top:1px solid var(--border);padding-top:24px}
+.jobs h2{font-family:var(--font-display);font-size:21px;font-weight:600;margin:0 0 6px}
+.jobs .lead{margin:0 0 18px;color:var(--muted-foreground);font-size:16px}
+.grp{margin-top:20px}
+.grp b{font-family:var(--font-display);font-size:16px;font-weight:600;display:block}
+.grp span{display:block;font-size:14px;color:var(--subtle);margin:2px 0 10px}
+.job{display:flex;gap:14px;padding:9px 0;border-top:1px solid var(--border);align-items:baseline}
+.job i{font-style:normal;font-family:var(--font-display);font-size:15px;font-weight:600;
+  flex:0 0 240px;line-height:1.35}
+.job p{margin:0;font-size:14.5px;color:var(--muted-foreground);line-height:1.5}
+.startq{margin:34px 0 0;padding-top:22px;border-top:1px solid var(--border)}
+.startq h2{font-family:var(--font-display);font-size:21px;font-weight:600;margin:0 0 6px}
+.startq p{margin:0;color:var(--muted-foreground);font-size:16px}
+
 .q{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);
   padding:24px 26px 20px;margin-top:22px}
 .q.done{border-color:#C7D6EC}
@@ -98,6 +112,9 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--border);
   <h1 id="title"></h1>
   <p class="intro" id="intro"></p>
 
+  <section class="jobs" id="jobsBlock"></section>
+
+  <div class="startq"><h2 id="qTitle"></h2><p id="qLead"></p></div>
   <div id="questions"></div>
 
   <div class="out" id="out" hidden>
@@ -140,6 +157,16 @@ $("#go").textContent = Q.ui.button;
 $("#outTitle").textContent = Q.ui.outTitle;
 $("#outText").textContent = Q.ui.outText;
 $("#foot").textContent = "AIST POS · навык " + SKILL_VERSION + " · первый разговор";
+
+/* каталог задач: человек сначала видит, что вообще можно поручить, и только потом отвечает */
+$("#jobsBlock").innerHTML = '<h2>' + esc(Q.ui.jobsTitle) + '</h2><p class="lead">' +
+  esc(Q.ui.jobsLead) + "</p>" +
+  Q.groups.map(g => '<div class="grp"><b>' + esc(g.title) + "</b><span>" + esc(g.note) + "</span>" +
+    Q.jobs.filter(j => j.group === g.id).map(j =>
+      '<div class="job"><i>' + esc(j.title) + "</i><p>" + esc(j.promise) + "</p></div>").join("") +
+    "</div>").join("");
+$("#qTitle").textContent = Q.ui.qTitle;
+$("#qLead").textContent = Q.ui.qLead;
 
 $("#questions").innerHTML = Q.questions.map((q, qi) =>
   '<section class="q" id="q' + qi + '">' +
